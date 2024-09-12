@@ -1,101 +1,178 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { Button } from "@/components/ui/button";
+import React, { useState } from "react";
+
+type FeedbackColor = "gray" | "yellow" | "green" | "default";
+
+interface Tile {
+  value: string;
+  color: FeedbackColor;
+}
+
+interface Guess {
+  tiles: Tile[];
+}
+
+interface KeyboardProps {
+  onKeyPress: (key: string) => void;
+  feedback: Record<string, FeedbackColor>;
+}
+
+const Keyboard = ({ onKeyPress, feedback }: KeyboardProps) => {
+  const numberKeys = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
+  const operatorAndActionKeys = ["Enter", "+", "-", "*", "/", "Backspace"];
+
+  const renderKeys = (keys: string[]) =>
+    keys.map((key) => (
+      <Button
+        key={key}
+        onClick={() => onKeyPress(key)}
+        variant={getButtonVariant(feedback[key])}
+      >
+        {key === "Backspace" ? "Delete" : key}
+      </Button>
+    ));
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+    <div className="flex flex-col gap-2 mt-4 items-center">
+      <div className="flex gap-2">{renderKeys(numberKeys)}</div>
+      <div className="flex gap-2">{renderKeys(operatorAndActionKeys)}</div>
     </div>
   );
-}
+};
+
+const getButtonVariant = (
+  color?: FeedbackColor
+): "default" | "gray" | "yellow" | "green" => {
+  return color ?? "default";
+};
+
+const targetEquation = "55+5*2";
+const targetResult = 65;
+
+const Mathler: React.FC = () => {
+  const [guesses, setGuesses] = useState<Guess[]>([]);
+  const [currentGuess, setCurrentGuess] = useState<string>("");
+  const [gameOver, setGameOver] = useState<boolean>(false);
+  const [keyboardFeedback, setKeyboardFeedback] = useState<
+    Record<string, FeedbackColor>
+  >({});
+
+  const handleKeyPress = (key: string) => {
+    if (gameOver) return;
+
+    if (key === "Enter") {
+      handleSubmitGuess();
+    } else if (key === "Backspace") {
+      setCurrentGuess((prev) => prev.slice(0, -1));
+    } else if (currentGuess.length < 6) {
+      setCurrentGuess((prev) => prev + key);
+    }
+  };
+
+  const handleSubmitGuess = () => {
+    if (guesses.length >= 6 || gameOver || currentGuess.length < 6) return;
+
+    const guessResult = evaluateEquation(currentGuess);
+    if (guessResult === targetResult) {
+      setGameOver(true);
+    }
+
+    const feedback = getFeedback(currentGuess, targetEquation);
+
+    const newGuess: Guess = {
+      tiles: currentGuess.split("").map((char, index) => ({
+        value: char,
+        color: feedback[index],
+      })),
+    };
+
+    setGuesses([...guesses, newGuess]);
+    updateKeyboardFeedback(currentGuess, feedback);
+    setCurrentGuess("");
+  };
+
+  const updateKeyboardFeedback = (guess: string, feedback: FeedbackColor[]) => {
+    const updatedFeedback = { ...keyboardFeedback };
+
+    guess.split("").forEach((char, index) => {
+      if (feedback[index] === "green") {
+        updatedFeedback[char] = "green";
+      } else if (
+        feedback[index] === "yellow" &&
+        updatedFeedback[char] !== "green"
+      ) {
+        updatedFeedback[char] = "yellow";
+      } else if (feedback[index] === "gray" && !updatedFeedback[char]) {
+        updatedFeedback[char] = "gray";
+      }
+    });
+
+    setKeyboardFeedback(updatedFeedback);
+  };
+
+  const getFeedback = (guess: string, target: string): FeedbackColor[] => {
+    const feedback = Array(guess.length).fill<FeedbackColor>("gray");
+
+    guess.split("").forEach((char, index) => {
+      if (char === target[index]) {
+        feedback[index] = "green";
+      } else if (target.includes(char)) {
+        feedback[index] = "yellow";
+      }
+    });
+
+    return feedback;
+  };
+
+  const evaluateEquation = (equation: string) => {
+    try {
+      return eval(equation);
+    } catch (error) {
+      return null;
+    }
+  };
+
+  return (
+    <div className="flex flex-col items-center">
+      <h1 className="text-2xl font-bold mb-4">Mathler</h1>
+      <div className="grid grid-rows-6 gap-2">
+        {guesses.map((guess, i) => (
+          <div key={i} className="flex gap-2">
+            {guess.tiles.map((tile, j) => (
+              <div
+                key={j}
+                className={`w-12 h-12 flex items-center justify-center text-2xl font-bold border-2 bg-${getButtonVariant(
+                  tile.color
+                )}-600`}
+              >
+                {tile.value}
+              </div>
+            ))}
+          </div>
+        ))}
+        {!gameOver && guesses.length < 6 && (
+          <div className="flex gap-2">
+            {Array(6)
+              .fill("")
+              .map((_, i) => (
+                <div
+                  key={i}
+                  className="w-12 h-12 flex items-center justify-center text-2xl font-bold border-2"
+                >
+                  {currentGuess[i] || ""}
+                </div>
+              ))}
+          </div>
+        )}
+      </div>
+      <Keyboard onKeyPress={handleKeyPress} feedback={keyboardFeedback} />
+      {gameOver && (
+        <p className="mt-4 text-green-500">You found the correct equation!</p>
+      )}
+    </div>
+  );
+};
+
+export default Mathler;
