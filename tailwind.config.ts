@@ -70,6 +70,7 @@ const config: Config = {
       },
       animation: {
         aurora: "aurora 60s linear infinite",
+        grid: "grid 15s linear infinite",
       },
       keyframes: {
         aurora: {
@@ -79,6 +80,10 @@ const config: Config = {
           to: {
             backgroundPosition: "350% 50%, 350% 50%",
           },
+        },
+        grid: {
+          "0%": { transform: "translateY(-50%)" },
+          "100%": { transform: "translateY(0)" },
         },
       },
     },

@@ -1,8 +1,10 @@
 "use client";
 
+import RetroGrid from "@/components/magicui/retro-grid";
 import { Button } from "@/components/ui/button";
 import { ToastAction } from "@/components/ui/toast";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/utils/cn";
 import { evaluate } from "@/utils/evaluate";
 import { useCallback, useEffect, useState } from "react";
 import useSound from "use-sound";
@@ -40,14 +42,53 @@ const Keyboard = ({ onKeyPress, feedback }: KeyboardProps) => {
 
   return (
     <div className="flex flex-col gap-2 items-center">
-      <div className="flex gap-2">{renderKeys(numberKeys)}</div>
-      <div className="flex gap-2">{renderKeys(operatorAndActionKeys)}</div>
+      <div className="flex gap-2 flex-wrap justify-center">
+        {renderKeys(numberKeys)}
+      </div>
+      <div className="flex gap-2 flex-wrap justify-center">
+        {renderKeys(operatorAndActionKeys)}
+      </div>
     </div>
   );
 };
 
 const getFeedbackColor = (color?: FeedbackColor): FeedbackColor => {
   return color ?? "default";
+};
+
+// Função para renderizar as tiles de uma linha preenchida
+const renderTiles = (tiles: Tile[]) => {
+  return tiles.map((tile, tileIndex) => (
+    <div
+      key={tileIndex}
+      className={cn(
+        "w-8 md:w-10 lg:w-12 aspect-square flex items-center justify-center text-2xl font-bold border rounded-md shadow-lg",
+        `bg-${getFeedbackColor(tile.color)}`
+      )}
+    >
+      {tile.value}
+    </div>
+  ));
+};
+
+// Função para renderizar uma linha vazia ou a linha atual
+const renderEmptyOrCurrentRow = (
+  isCurrentRow: boolean,
+  currentGuess: string
+) => {
+  return Array(6)
+    .fill("")
+    .map((_, tileIndex) => (
+      <div
+        key={tileIndex}
+        className={cn(
+          "w-8 md:w-10 lg:w-12 aspect-square flex items-center justify-center text-2xl font-bold border rounded-md shadow-lg bg-white border-gray ",
+          !isCurrentRow && "opacity-80"
+        )}
+      >
+        {isCurrentRow ? currentGuess[tileIndex] || "" : ""}
+      </div>
+    ));
 };
 
 const targetEquation = "55+5*2";
@@ -191,50 +232,48 @@ export default function Mathler() {
   };
 
   return (
-    <div className="flex flex-col gap-4 py-8 min-h-screen justify-between">
-      <div className="flex flex-col gap-4 items-center">
-        <h1 className="text-2xl font-bold leading-none">Mathler</h1>
-        <h2 className="text-md leading-none">
-          Solve the hidden equation{" "}
-          <span className="bg-warning p-1">that results in {targetResult}</span>
-        </h2>
-        <div className="grid grid-rows-6 gap-2">
-          {guesses.map((guess, i) => (
-            <div key={i} className="flex gap-2">
-              {guess.tiles.map((tile, j) => (
-                <div
-                  key={j}
-                  className={`w-12 h-12 flex items-center justify-center text-2xl font-bold border bg-${getFeedbackColor(
-                    tile.color
-                  )}`}
-                >
-                  {tile.value}
-                </div>
-              ))}
-            </div>
-          ))}
-          {!gameOver && guesses.length < 6 && (
-            <div className="flex gap-2">
-              {Array(6)
-                .fill("")
-                .map((_, i) => (
+    <div className="flex h-screen min-h-[640px] justify-center items-center align-center z-0">
+      <RetroGrid />
+      <div className="flex flex-col gap-8 	 p-8 z-10 rounded-xl">
+        <div className="flex flex-col gap-4 items-center">
+          <h1 className="text-2xl font-bold leading-none">Mathler</h1>
+          <h2 className="text-md leading-none">
+            Solve the hidden equation{" "}
+            <span className="bg-warning p-1">
+              that results in {targetResult}
+            </span>
+          </h2>
+          <div className="grid grid-rows-6 gap-2">
+            {Array(6)
+              .fill("")
+              .map((_, rowIndex) => {
+                const guess = guesses[rowIndex];
+                const isCurrentRow = rowIndex === guesses.length;
+                const isFilled = Boolean(guess);
+
+                return (
                   <div
-                    key={i}
-                    className="w-12 h-12 flex items-center justify-center text-2xl font-bold border-2"
+                    key={rowIndex}
+                    className={cn(
+                      "flex gap-2",
+                      !isFilled && !isCurrentRow && "opacity-50"
+                    )}
                   >
-                    {currentGuess[i] || ""}
+                    {isFilled
+                      ? renderTiles(guess.tiles)
+                      : renderEmptyOrCurrentRow(isCurrentRow, currentGuess)}
                   </div>
-                ))}
-            </div>
-          )}
+                );
+              })}
+          </div>
         </div>
+        <Keyboard onKeyPress={handleKeyPress} feedback={keyboardFeedback} />
+        {gameOver && (
+          <p className="mt-4 text-success font-bold">
+            You found the correct equation!
+          </p>
+        )}
       </div>
-      <Keyboard onKeyPress={handleKeyPress} feedback={keyboardFeedback} />
-      {gameOver && (
-        <p className="mt-4 text-success font-bold">
-          You found the correct equation!
-        </p>
-      )}
     </div>
   );
 }
