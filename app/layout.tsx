@@ -1,18 +1,9 @@
 import { Toaster } from "@/components/ui/toaster";
 import type { Metadata } from "next";
-import localFont from "next/font/local";
+import { Press_Start_2P } from "next/font/google";
 import "./globals.css";
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
+const ps2 = Press_Start_2P({ subsets: ["latin"], weight: ["400"] });
 
 export const metadata: Metadata = {
   title: "Mathler React",
@@ -26,9 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${ps2.className} antialiased`}>
         {children}
         <Toaster />
       </body>

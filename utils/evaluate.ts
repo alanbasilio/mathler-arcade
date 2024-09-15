@@ -1,7 +1,7 @@
-export function evaluate(equation: string): number | false {
+export function evaluate(equation: string): number {
   try {
     return new Function(`return ${equation};`)();
   } catch (error) {
-    return false;
+    return 0;
   }
 }
