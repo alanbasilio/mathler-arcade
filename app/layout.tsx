@@ -1,5 +1,6 @@
 import { Toaster } from "@/components/ui/toaster";
 import type { Metadata } from "next";
+import { ThemeProvider } from "next-themes";
 import { Press_Start_2P } from "next/font/google";
 import "./globals.css";
 
@@ -18,8 +19,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${ps2.className} antialiased`}>
-        {children}
-        <Toaster />
+        <ThemeProvider attribute="class">
+          {children}
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

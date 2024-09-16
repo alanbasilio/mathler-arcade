@@ -6,8 +6,8 @@ import { equations } from "@/data/equations";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/utils/cn";
 import { evaluate } from "@/utils/evaluate";
-import { Info, Settings } from "lucide-react";
-import Link from "next/link";
+import { Info, Moon, Settings, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
 import { useCallback, useEffect, useState } from "react";
 import useSound from "use-sound";
 
@@ -125,6 +125,7 @@ const renderEmptyOrCurrentRow = (
 };
 
 export default function Mathler() {
+  const { theme, setTheme } = useTheme();
   const [playGame, setPlayGame] = useState<boolean>(false);
   const [guesses, setGuesses] = useState<Guess[]>([]);
   const [currentGuess, setCurrentGuess] = useState<string>("");
@@ -147,6 +148,7 @@ export default function Mathler() {
   });
   const [playMcPlus] = useSound("/mp3/mc-plus.mp3", {
     volume: 0.02,
+    loop: true,
   });
 
   const playSound = useCallback(
@@ -331,13 +333,19 @@ export default function Mathler() {
     };
   }, [handleKeyPress]);
 
+  const handleTheme = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
+    playSound("click");
+  };
+
   return (
     <div className="flex h-screen min-h-[640px] justify-center items-center align-center z-0">
+      <div className="absolute inset-0 bg-[url('/images/noise.gif')] bg-cover z-0 opacity-40" />
       {!gameOver && !winGame && <RetroGrid />}
       {playGame ? (
         gameOver ? (
           <div className="flex flex-col items-center">
-            <div className="absolute inset-0 bg-[url('/images/static.gif')] bg-cover z-0 opacity-40" />
+            <div className="absolute inset-0 bg-[url('/images/noise.gif')] bg-cover z-0 opacity-40" />
             <h1
               className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-extrabold italic leading-none z-10"
               data-cy="title"
@@ -349,19 +357,35 @@ export default function Mathler() {
           <>
             <div className="flex flex-col gap-8 p-8 z-10 items-center">
               <div className="text-center space-y-4">
-                <div className="flex flex-col items-center justify-center">
-                  <Link href="#" className="lg:absolute lg:left-5 lg:top-5">
-                    <Info />
-                  </Link>
-                  <h1
-                    className="text-2xl tracking-tighter md:text-3xl lg:text-4xl xl:text-5xl italic leading-none"
-                    data-cy="title"
+                <h1
+                  className="text-2xl tracking-tighter md:text-3xl lg:text-4xl xl:text-5xl italic leading-none"
+                  data-cy="title"
+                >
+                  Mathler
+                </h1>
+                <div className="flex flex-col items-center justify-center gap-4">
+                  <Button
+                    className="lg:absolute lg:left-5 lg:top-5"
+                    size="icon"
+                    variant="link"
                   >
-                    Mathler
-                  </h1>
-                  <Link href="#" className="lg:absolute lg:right-5 lg:top-5">
+                    <Info />
+                  </Button>
+                  <Button
+                    className="lg:absolute lg:right-5 lg:top-5"
+                    size="icon"
+                    variant="link"
+                  >
                     <Settings />
-                  </Link>
+                  </Button>
+                  <Button
+                    className="lg:absolute lg:right-5 lg:bottom-5"
+                    size="icon"
+                    onClick={handleTheme}
+                    variant="link"
+                  >
+                    {theme === "dark" ? <Sun /> : <Moon />}
+                  </Button>
                 </div>
                 <h2 className="text-xs leading-none" data-cy="subtitle">
                   Solve the hidden equation{" "}
