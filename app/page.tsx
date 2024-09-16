@@ -2,11 +2,18 @@
 
 import RetroGrid from "@/components/retro-grid";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { equations } from "@/data/equations";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/utils/cn";
 import { evaluate } from "@/utils/evaluate";
-import { Info, Moon, Settings, Sun } from "lucide-react";
+import { Info, Moon, Settings, Sun, Volume2, VolumeOff } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useCallback, useEffect, useState } from "react";
 import useSound from "use-sound";
@@ -28,7 +35,6 @@ const calculateResult = (equation: string): number => {
 
 const targetEquation = getEquationOfTheDay();
 const targetResult = calculateResult(targetEquation);
-console.log(targetEquation, targetResult);
 
 type FeedbackColor = "accent" | "warning" | "success" | "default";
 
@@ -64,8 +70,8 @@ const Keyboard = ({
         onClick={() => onKeyPress(key)}
         variant={getFeedbackColor(feedback[key])}
         data-cy={`key-${key}`}
-        className={cn("border-2 border-transparent", {
-          "bg-accent": activeKey === key,
+        className={cn({
+          "scale-95": activeKey === key,
           "animate-pulse": highlightEnter && key === "Enter",
         })}
       >
@@ -94,7 +100,7 @@ const renderTiles = (tiles: Tile[]) => {
     <div
       key={tileIndex}
       className={cn(
-        "w-8 md:w-10 lg:w-12 aspect-square flex items-center justify-center text-sm md:text-base lg:text-lg xl:text-2xl font-bold border-foreground border-2 rounded-md shadow-lg",
+        "w-8 md:w-10 lg:w-12 aspect-square flex items-center justify-center text-sm md:text-base lg:text-lg xl:text-2xl font-bold border-foreground border-4 shadow-lg",
         `bg-${getFeedbackColor(tile.color)}`
       )}
       data-cy={`tile-${tileIndex}`}
@@ -114,7 +120,7 @@ const renderEmptyOrCurrentRow = (
       <div
         key={tileIndex}
         className={cn(
-          "w-8 md:w-10 lg:w-12 aspect-square flex items-center justify-center text-sm md:text-base lg:text-lg xl:text-2xl font-bold border-foreground border-2 rounded-md shadow-lg",
+          "w-8 md:w-10 lg:w-12 aspect-square flex items-center justify-center text-sm md:text-base lg:text-lg xl:text-2xl font-bold border-foreground border-4 shadow-lg",
           !isCurrentRow && "opacity-80"
         )}
         data-cy={`tile-${tileIndex}`}
@@ -131,23 +137,32 @@ export default function Mathler() {
   const [currentGuess, setCurrentGuess] = useState<string>("");
   const [gameOver, setGameOver] = useState<boolean>(false);
   const [winGame, setWinGame] = useState<boolean>(false);
+  const [stopAudio, setStopAudio] = useState<boolean>(false);
   const [keyboardFeedback, setKeyboardFeedback] = useState<
     Record<string, FeedbackColor>
   >({});
   const [activeKey, setActiveKey] = useState<string | null>(null);
   const [highlightEnter, setHighlightEnter] = useState<boolean>(false);
   const { toast } = useToast();
-  const [playEnter] = useSound("/mp3/enter.mp3", { volume: 0.25 });
-  const [playBack] = useSound("/mp3/back.mp3", { volume: 0.25 });
-  const [playClick] = useSound("/mp3/click.mp3", { volume: 0.25 });
+  const audioVolume = stopAudio ? 0 : 0.25;
+  const mcPlusAudioVolume = stopAudio ? 0 : 0.01;
+  const [playEnter] = useSound("/mp3/enter.mp3", {
+    volume: audioVolume,
+  });
+  const [playBack] = useSound("/mp3/back.mp3", {
+    volume: audioVolume,
+  });
+  const [playClick] = useSound("/mp3/click.mp3", {
+    volume: audioVolume,
+  });
   const [playWarning] = useSound("/mp3/warning.mp3", {
-    volume: 0.25,
+    volume: audioVolume,
   });
   const [playSuccess] = useSound("/mp3/success.mp3", {
-    volume: 0.25,
+    volume: audioVolume,
   });
   const [playMcPlus] = useSound("/mp3/mc-plus.mp3", {
-    volume: 0.02,
+    volume: mcPlusAudioVolume,
     loop: true,
   });
 
@@ -193,7 +208,7 @@ export default function Mathler() {
         return;
       }
 
-      if (currentGuess.length <= 6) {
+      if (currentGuess.length < 5) {
         setHighlightEnter(false);
         setActiveKey(key);
         setTimeout(() => setActiveKey(null), 100);
@@ -205,6 +220,7 @@ export default function Mathler() {
         handleSubmitGuess();
         setHighlightEnter(false);
       } else if (key === "Backspace") {
+        setHighlightEnter(false);
         playSound("back");
         setCurrentGuess((prev) => prev.slice(0, -1));
       } else if (currentGuess.length < 6) {
@@ -338,14 +354,17 @@ export default function Mathler() {
     playSound("click");
   };
 
+  const handleStopAudio = () => {
+    setStopAudio(!stopAudio);
+  };
+
   return (
-    <div className="flex h-screen min-h-[640px] justify-center items-center align-center z-0">
-      <div className="absolute inset-0 bg-[url('/images/noise.gif')] bg-cover z-0 opacity-40" />
+    <div className="flex min-h-screen justify-center items-center align-center z-0">
+      <div className="fixed inset-0 bg-[url('/images/noise.gif')] bg-cover z-0 opacity-40" />
       {!gameOver && !winGame && <RetroGrid />}
       {playGame ? (
         gameOver ? (
           <div className="flex flex-col items-center">
-            <div className="absolute inset-0 bg-[url('/images/noise.gif')] bg-cover z-0 opacity-40" />
             <h1
               className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-extrabold italic leading-none z-10"
               data-cy="title"
@@ -356,46 +375,98 @@ export default function Mathler() {
         ) : (
           <>
             <div className="flex flex-col gap-8 p-8 z-10 items-center">
-              <div className="text-center space-y-4">
+              <div className="text-center space-y-2">
                 <h1
                   className="text-2xl tracking-tighter md:text-3xl lg:text-4xl xl:text-5xl italic leading-none"
                   data-cy="title"
                 >
                   Mathler
                 </h1>
-                <div className="flex flex-col items-center justify-center gap-4">
-                  <Button
-                    className="lg:absolute lg:left-5 lg:top-5"
-                    size="icon"
-                    variant="link"
-                  >
-                    <Info />
-                  </Button>
-                  <Button
-                    className="lg:absolute lg:right-5 lg:top-5"
-                    size="icon"
-                    variant="link"
-                  >
-                    <Settings />
-                  </Button>
-                  <Button
-                    className="lg:absolute lg:right-5 lg:bottom-5"
-                    size="icon"
-                    onClick={handleTheme}
-                    variant="link"
-                  >
-                    {theme === "dark" ? <Sun /> : <Moon />}
-                  </Button>
-                </div>
+
                 <h2 className="text-xs leading-none" data-cy="subtitle">
                   Solve the hidden equation{" "}
                   <span className="bg-foreground text-background p-1 max-lg:block max-lg:mt-2">
                     that results in {targetResult}
                   </span>
                 </h2>
+                <div className="flex flex-row justify-center gap-4">
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button className="lg:absolute lg:left-5 lg:top-5">
+                        <Info />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>How to Play Mathler</DialogTitle>
+                      </DialogHeader>
+                      <div className="prose space-y-2 text-sm">
+                        <p>Try to find the hidden calculation in 6 guesses!</p>
+                        <p>
+                          After each guess, the color of the tiles will change
+                          to show how close you are to the solution.
+                        </p>
+
+                        <p className="flex gap-2">
+                          <Button variant="success">5</Button>
+                          <Button variant="accent">0</Button>
+                          <Button variant="success">/</Button>
+                          <Button variant="warning">5</Button>
+                          <Button variant="accent">-</Button>
+                          <Button variant="accent">2</Button>
+                        </p>
+
+                        <ul className="list-disc pl-4">
+                          <li>Green are in the correct place.</li>
+                          <li>
+                            Orange are in the solution, but in a different
+                            place.
+                          </li>
+                          <li>Gray are not in the solution.</li>
+                        </ul>
+
+                        <p className="font-bold">Additional Rules</p>
+
+                        <ul className="list-disc pl-4">
+                          <li>
+                            Numbers and operators can appear multiple times.
+                          </li>
+                          <li>
+                            Calculate / or * before - or + (order of
+                            operations).
+                          </li>
+                          <li>
+                            Commutative solutions are accepted, for example
+                            20+7+3 and 3+7+20.
+                          </li>
+                          <li>
+                            Commutative solutions will be automatically
+                            rearranged to the exact solution.
+                          </li>
+                        </ul>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+
+                  <Button className="lg:absolute lg:right-5 lg:top-5">
+                    <Settings />
+                  </Button>
+                  <Button
+                    className="lg:absolute lg:right-5 lg:bottom-5"
+                    onClick={handleTheme}
+                  >
+                    {theme === "dark" ? <Moon /> : <Sun />}
+                  </Button>
+                  <Button
+                    className="lg:absolute lg:left-5 lg:bottom-5"
+                    onClick={handleStopAudio}
+                  >
+                    {stopAudio ? <VolumeOff /> : <Volume2 />}
+                  </Button>
+                </div>
               </div>
               <div
-                className="grid grid-rows-6 gap-2 bg-background/20 backdrop-blur-sm border-2 border-foreground  rounded-md p-2"
+                className="grid grid-rows-6 gap-2 bg-background/20 backdrop-blur-sm border-4 border-foreground p-2"
                 data-cy="grid"
               >
                 {Array(6)
@@ -447,9 +518,12 @@ export default function Mathler() {
           >
             Mathler
           </h1>
-          <Button onClick={startGame} className="animate-pulse">
+          <button
+            onClick={startGame}
+            className="animate-pulse nes-btn is-primary"
+          >
             PRESS TO START
-          </Button>
+          </button>
         </div>
       )}
     </div>

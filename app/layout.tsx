@@ -1,4 +1,5 @@
 import { Toaster } from "@/components/ui/toaster";
+import "nes.css/css/nes.min.css";
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import { Press_Start_2P } from "next/font/google";

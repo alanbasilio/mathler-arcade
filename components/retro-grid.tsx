@@ -10,13 +10,13 @@ export default function RetroGrid({
   return (
     <div
       className={cn(
-        "pointer-events-none absolute size-full overflow-hidden opacity-50 [perspective:200px]",
+        "pointer-events-none fixed size-full overflow-hidden opacity-50 [perspective:200px]",
         className
       )}
       style={{ "--grid-angle": `${angle}deg` } as React.CSSProperties}
     >
       {/* Grid */}
-      <div className="absolute inset-0 [transform:rotateX(var(--grid-angle))]">
+      <div className="fixed inset-0 [transform:rotateX(var(--grid-angle))]">
         <div
           className={cn(
             "animate-grid [height:300vh] [width:600vw] [margin-left:-50%] [transform-origin:100%_0_0]",
