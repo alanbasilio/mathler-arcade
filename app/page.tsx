@@ -2,6 +2,7 @@
 
 import RetroGrid from "@/components/retro-grid";
 import { Button } from "@/components/ui/button";
+import { equations } from "@/data/equations";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/utils/cn";
 import { evaluate } from "@/utils/evaluate";
@@ -10,73 +11,22 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import useSound from "use-sound";
 
-// Utility functions
-const generateSeed = (date: Date): number => {
-  const year = date.getFullYear();
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-  return year * 10000 + month * 100 + day;
-};
-
-const generateEquation = (seed: number): string => {
-  const operators = ["+", "-", "*", "/"];
-  let equation: string;
-
-  const isValidEquation = (eq: string): boolean => {
-    try {
-      const result = calculateResult(eq);
-      return Number.isInteger(result) && result > 0;
-    } catch {
-      return false;
-    }
-  };
-
-  const getRandomOperator = (index: number): string => {
-    return operators[index % operators.length];
-  };
-
-  const getRandomNumber = (index: number): number => {
-    return (index % 9) + 1; // Generates a number between 1 and 9
-  };
-
-  do {
-    equation = "";
-    let currentSeed = seed;
-
-    while (equation.length < 5) {
-      const num = getRandomNumber(currentSeed);
-      equation += num.toString();
-      currentSeed = Math.floor(currentSeed / 10);
-
-      if (equation.length < 5) {
-        const operator = getRandomOperator(currentSeed);
-        equation += operator;
-        currentSeed = Math.floor(currentSeed / 10);
-      }
-    }
-
-    // Ensure the equation ends with a number
-    const lastNum = getRandomNumber(currentSeed);
-    equation += lastNum.toString();
-  } while (!isValidEquation(equation));
-
-  return equation;
-};
+export function getEquationOfTheDay() {
+  const now = new Date();
+  const start = new Date(2022, 0, 0);
+  const diff = Number(now) - Number(start);
+  let day = Math.floor(diff / (1000 * 60 * 60 * 24));
+  while (day > equations.length) {
+    day -= equations.length;
+  }
+  return equations[day];
+}
 
 const calculateResult = (equation: string): number => {
   return evaluate(equation);
 };
 
-// Initial setup
-const getDateFromString = (dateString: string): Date => {
-  const [day, month, year] = dateString.split("-").map(Number);
-  return new Date(year, month - 1, day);
-};
-
-const dateString = "15-09-2024"; // Format: 'dd-mm-yyyy'
-const date = dateString ? getDateFromString(dateString) : new Date();
-const seed = generateSeed(date);
-const targetEquation = generateEquation(seed);
+const targetEquation = getEquationOfTheDay();
 const targetResult = calculateResult(targetEquation);
 console.log(targetEquation, targetResult);
 
@@ -276,7 +226,6 @@ export default function Mathler() {
 
     if (guesses.length >= 6 || gameOver) return;
 
-    // Check if the guess has been made before
     if (
       guesses.some(
         (guess) =>
