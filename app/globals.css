@@ -6,10 +6,10 @@
   :root {
     --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;
-    --primary: 203.88deg 85.83% 52.94%;
+    --primary: 203.88 85.83% 52.94%;
     --destructive: 0 84.2% 60.2%;
-    --warning: 50.64deg 93.16% 54.12%;
-    --success: 85.04deg 57.68% 52.75%;
+    --warning: 50.64 93.16% 54.12%;
+    --success: 85.04 57.68% 52.75%;
     --secondary: 0 0% 60%;
     --border: var(--secondary);
     --input: var(--secondary);
