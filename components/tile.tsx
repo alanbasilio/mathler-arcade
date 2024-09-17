@@ -11,17 +11,11 @@ export interface TileProps {
   index: number;
 }
 
-export const Tile: React.FC<TileProps> = ({
-  value,
-  color,
-  isCurrentRow,
-  index,
-}) => (
+export const Tile: React.FC<TileProps> = ({ value, color, index }) => (
   <div
     className={cn(
       "w-8 md:w-10 lg:w-12 aspect-square flex items-center justify-center text-sm md:text-base lg:text-lg xl:text-2xl font-bold border-foreground border-4 shadow-lg",
-      color ? `bg-${getFeedbackColor(color)}` : "",
-      isCurrentRow === false && "opacity-80"
+      color ? `bg-${getFeedbackColor(color)}` : ""
     )}
     data-cy={`tile-${index}`}
   >

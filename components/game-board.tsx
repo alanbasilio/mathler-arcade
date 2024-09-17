@@ -47,7 +47,6 @@ export const GameBoard = ({ guesses, currentGuess }: GameBoardProps) => {
                         : ""
                     }
                     color={isFilled ? guess.tiles[index].color : undefined}
-                    isCurrentRow={!isFilled && isCurrentRow}
                     index={index}
                   />
                 ))}
