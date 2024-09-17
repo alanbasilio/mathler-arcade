@@ -10,8 +10,11 @@ import { useGame } from "@/hooks/use-game";
 import { useAudio } from "@/providers/audio-provider";
 import { evaluate } from "@/utils/evaluate";
 import { getNumberOfTheDay } from "@/utils/numbers";
-import { Moon, Sun, Volume2, VolumeOff } from "lucide-react";
+import { GoogleAnalytics } from "@next/third-parties/google";
+import { GitHubLogoIcon } from "@radix-ui/react-icons";
+import { Heart, Moon, MusicIcon, Sun, Volume2, VolumeOff } from "lucide-react";
 import { useTheme } from "next-themes";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useMediaQuery } from "usehooks-ts";
 
@@ -134,11 +137,40 @@ export default function Mathler() {
                 Come back tomorrow for a new challenge!
               </p>
             )}
+            <div className="flex items-center gap-2">
+              <Link
+                href="https://github.com/alanbasilio/mathler-arcade"
+                target="_blank"
+                className="text-xs flex items-center gap-2"
+              >
+                <GitHubLogoIcon className="w-3 h-3" />
+                Github
+              </Link>
+              |
+              <Link
+                href="https://www.youtube.com/watch?v=aQkPcPqTq4M"
+                target="_blank"
+                className="text-xs flex items-center gap-2"
+              >
+                <MusicIcon className="w-3 h-3" />
+                Music by Macintosh Plus
+              </Link>
+              |
+              <Link
+                href="https://www.alanbasilio.com"
+                target="_blank"
+                className="text-xs flex items-center gap-2"
+              >
+                <Heart className="w-3 h-3" />
+                Made by Alan Basilio
+              </Link>
+            </div>
           </div>
         )
       ) : (
         <Start startGame={startGame} />
       )}
+      <GoogleAnalytics gaId="G-R20575MFZH" />
     </div>
   );
 }
