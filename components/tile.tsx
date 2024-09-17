@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from "@/utils/cn";
 import { getFeedbackColor } from "@/utils/feedback";
 import { FeedbackColor } from "@/utils/types";

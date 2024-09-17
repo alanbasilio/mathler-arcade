@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { cn } from "@/utils/cn";
 import { getFeedbackColor } from "@/utils/feedback";

@@ -5,8 +5,8 @@ import { Keyboard } from "@/components/keyboard";
 import RetroGrid from "@/components/retro-grid";
 import { Start } from "@/components/start";
 import { Tutorial } from "@/components/tutorial";
-import { useAudio } from "@/hooks/use-audio";
 import { useGame } from "@/hooks/use-game";
+import { useAudio } from "@/providers/audio-provider";
 import { evaluate } from "@/utils/evaluate";
 import { getNumberOfTheDay } from "@/utils/numbers";
 import { Moon, Settings, Sun, Volume2, VolumeOff } from "lucide-react";
@@ -29,7 +29,7 @@ export default function Mathler() {
     handleKeyPress,
     startGame,
   } = useGame();
-  const { stopAudio, toggleAudio } = useAudio();
+  const { stopAudio, toggleAudio, playSound } = useAudio();
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const [activeKey, setActiveKey] = useState("");
 
@@ -53,7 +53,10 @@ export default function Mathler() {
     }
   }, [activeKey]);
 
-  const handleTheme = () => setTheme(theme === "dark" ? "light" : "dark");
+  const handleTheme = () => {
+    playSound("click");
+    setTheme(theme === "dark" ? "light" : "dark");
+  };
 
   const ThemeToggleIcon = theme === "dark" ? Moon : Sun;
   const AudioIcon = stopAudio ? VolumeOff : Volume2;

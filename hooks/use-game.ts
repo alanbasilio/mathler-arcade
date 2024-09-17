@@ -1,6 +1,6 @@
 import { Guess } from "@/components/game-board";
-import { useAudio } from "@/hooks/use-audio";
 import { useToast } from "@/hooks/use-toast";
+import { useAudio } from "@/providers/audio-provider";
 import { evaluate } from "@/utils/evaluate";
 import { getFeedback } from "@/utils/feedback";
 import { getNumberOfTheDay } from "@/utils/numbers";
@@ -40,7 +40,6 @@ export const useGame = () => {
 
       if (key === "Enter") {
         handleSubmitGuess();
-        playSound("click");
       } else if (key === "Backspace") {
         playSound("back");
         setCurrentGuess((prev) => prev.slice(0, -1));

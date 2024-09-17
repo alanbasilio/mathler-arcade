@@ -1,7 +1,21 @@
-import { useCallback, useState } from "react";
+"use client";
+
+import React, { createContext, useCallback, useContext, useState } from "react";
 import useSound from "use-sound";
 
-export const useAudio = () => {
+interface AudioContextProps {
+  stopAudio: boolean;
+  toggleAudio: () => void;
+  playSound: (
+    sound: "click" | "warning" | "success" | "mc-plus" | "back" | "enter"
+  ) => void;
+}
+
+const AudioContext = createContext<AudioContextProps | undefined>(undefined);
+
+export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [stopAudio, setStopAudio] = useState<boolean>(false);
   const audioVolume = stopAudio ? 0 : 0.25;
   const mcPlusAudioVolume = stopAudio ? 0 : 0.01;
@@ -43,12 +57,21 @@ export const useAudio = () => {
   );
 
   const toggleAudio = () => {
+    playSound("click");
     setStopAudio(!stopAudio);
   };
 
-  return {
-    playSound,
-    stopAudio,
-    toggleAudio,
-  };
+  return (
+    <AudioContext.Provider value={{ stopAudio, toggleAudio, playSound }}>
+      {children}
+    </AudioContext.Provider>
+  );
+};
+
+export const useAudio = () => {
+  const context = useContext(AudioContext);
+  if (!context) {
+    throw new Error("useAudio must be used within an AudioProvider");
+  }
+  return context;
 };

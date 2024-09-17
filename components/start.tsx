@@ -1,3 +1,5 @@
+"use client";
+
 interface StartProps {
   startGame: () => void;
 }

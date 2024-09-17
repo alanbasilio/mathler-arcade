@@ -1,3 +1,5 @@
+"use client";
+
 import { Tile, TileProps } from "@/components/tile";
 import { cn } from "@/utils/cn";
 
