@@ -69,7 +69,7 @@ I would like to express my gratitude to the following individuals and projects t
 - **Rauno Freiberg** ([@raunofreiberg](https://github.com/raunofreiberg)) - Creator of the [UI Playbook](https://github.com/raunofreiberg/interfaces), which provided inspiring guidelines and best practices for creating intuitive user interfaces.
 - [**shadcn/ui**](https://github.com/shadcn/ui) - For providing a fantastic collection of accessible and customizable React components that greatly enhanced the user interface of this game.
 - The [**NES.css**](https://github.com/nostalgic-css/NES.css) team - For their nostalgic NES-style CSS Framework that added a delightful retro aesthetic to the game's design.
-- **Macintosh Plus** (aka [Ramona Andra Langley])(https://en.wikipedia.org/wiki/Ramona_Andra_Langley) - For the iconic vaporwave track "リサフランク 420 / 現代のコンピュー" (Lisa Frank 420 / Modern Computing) that served as the thematic inspiration for this project's aesthetic and atmosphere. Your groundbreaking work in the vaporwave genre has left an indelible mark on internet culture and music.
+- **Macintosh Plus** aka [Ramona Andra Langley](https://en.wikipedia.org/wiki/Ramona_Andra_Langley) - For the iconic vaporwave track "リサフランク 420 / 現代のコンピュー" (Lisa Frank 420 / Modern Computing) that served as the thematic inspiration for this project's aesthetic and atmosphere. Your groundbreaking work in the vaporwave genre has left an indelible mark on internet culture and music.
 
 - All the open-source contributors whose libraries and tools were used in this project.
 
