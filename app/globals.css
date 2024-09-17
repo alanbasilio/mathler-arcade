@@ -2,26 +2,52 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.9%;
+    --primary: 203.88 85.83% 52.94%;
+    --destructive: 0 84.2% 60.2%;
+    --warning: 50.64 93.16% 54.12%;
+    --success: 85.04 57.68% 52.75%;
+    --secondary: 0 0% 60%;
+    --border: var(--secondary);
+    --input: var(--secondary);
+    --muted: var(--secondary);
+    --accent: var(--secondary);
+    --card: var(--background);
+    --card-foreground: var(--foreground);
+    --popover: var(--background);
+    --popover-foreground: var(--foreground);
+    --secondary-foreground: var(--foreground);
+    --muted-foreground: var(--foreground);
+    --accent-foreground: var(--foreground);
+    --ring: var(--foreground);
+
+    --primary-foreground: var(--background);
+    --destructive-foreground: var(--background);
+    --success-foreground: var(--background);
+    --warning-foreground: var(--background);
+
+    --radius: 0;
+  }
+
+  .dark {
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 100%;
+    --secondary: 0 0% 70%;
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-}
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+  .nes-btn.is-success {
+    @apply text-foreground dark:text-background hover:text-foreground;
   }
 }
