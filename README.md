@@ -1,36 +1,75 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Mathler Arcade
+
+An Arcade-inspired math game.
+
+## Stack
+
+- **TypeScript**
+- **React**
+- **Next.js**
+- **Node.js**
+- **Tailwind CSS**
+- **shadcn/ui** for pre-built React components
+- **Radix UI** for accessible and customizable UI primitives
+- **NES.css** for retro-style UI components
+- **use-sound** for audio effects
+- **Cypress** for end-to-end testing
 
 ## Getting Started
 
-First, run the development server:
+1. Clone the repository:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+   ```bash
+   git clone https://github.com/alanbasilio/mathler-arcade.git
+   cd mathler-arcade
+   ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. Run the development server:
 
-## Learn More
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+4. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Scripts
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `dev`: Runs the development server.
+- `build`: Builds the application for production.
+- `start`: Starts the production server.
+- `lint`: Runs ESLint to check for linting errors.
+- `cypress:open`: Opens the Cypress test runner.
+- `cypress:run`: Runs Cypress tests in headless mode.
 
-## Deploy on Vercel
+## Curiosities
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Numbers and operators can appear multiple times.**
+- **Order of operation applies:** Multiplication and division are calculated before addition and subtraction.
+- **Color feedback:** After each guess, the color of the tiles changes to reflect the status:
+  - Green: Correct and in the right spot.
+  - Yellow: Correct but in the wrong spot.
+  - Grey: Not part of the equation.
+- **Cumulative solutions:** The game accepts cumulative solutions (e.g., 1+5*15 === 15*5+1).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Acknowledgements
+
+I would like to express my gratitude to the following individuals and projects that have contributed to making this game possible:
+
+- **Josh Comeau** - Creator of the [use-sound](https://github.com/joshwcomeau/use-sound) library, which greatly enhanced the audio experience in this game.
+- **Rauno Freiberg** - Creator of the [UI Playbook](https://github.com/raunofreiberg/interfaces), which provided inspiring guidelines and best practices for creating intuitive user interfaces.
+- [**shadcn/ui**](https://github.com/shadcn/ui) - For providing a fantastic collection of accessible and customizable React components that greatly enhanced the user interface of this game.
+- The [**NES.css**](https://github.com/nostalgic-css/NES.css) team - For their nostalgic NES-style CSS Framework that added a delightful retro aesthetic to the game's design.
+
+- All the open-source contributors whose libraries and tools were used in this project.
+
+Your work and contributions to the developer community are greatly appreciated!
