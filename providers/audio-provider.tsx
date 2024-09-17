@@ -17,8 +17,8 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [stopAudio, setStopAudio] = useState<boolean>(false);
-  const audioVolume = stopAudio ? 0 : 0.25;
-  const mcPlusAudioVolume = stopAudio ? 0 : 0.01;
+  const audioVolume = stopAudio ? 0 : 0.4;
+  const mcPlusAudioVolume = stopAudio ? 0 : 0.05;
 
   const [playEnter] = useSound("/mp3/enter.mp3", { volume: audioVolume });
   const [playBack] = useSound("/mp3/back.mp3", { volume: audioVolume });
