@@ -30,6 +30,7 @@ export const Settings = () => {
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogTrigger asChild onClick={handleClick}>
         <SettingsIcon className="lg:absolute lg:right-5 lg:top-5" />
+          data-cy="settings-icon"
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -45,6 +46,7 @@ export const Settings = () => {
                 name="difficulty"
                 checked={mode === "normal"}
                 onChange={() => handleModeChange("normal")}
+                data-cy="normal-mode-radio"
               />
               <span>Normal</span>
             </label>
@@ -55,12 +57,14 @@ export const Settings = () => {
                 name="difficulty"
                 checked={mode === "hard"}
                 onChange={() => handleModeChange("hard")}
+                data-cy="hard-mode-radio"
               />
               <span>Hard (no visual feedback)</span>
             </label>
           </div>
           <Button onClick={handleClose}>Ok</Button>
         </div>
+          data-cy="close-settings"
       </DialogContent>
     </Dialog>
   );
