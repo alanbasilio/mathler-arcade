@@ -29,8 +29,10 @@ export const Settings = () => {
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogTrigger asChild onClick={handleClick}>
-        <SettingsIcon className="lg:absolute lg:right-5 lg:top-5" />
+        <SettingsIcon
           data-cy="settings-icon"
+          className="lg:absolute lg:right-5 lg:top-5"
+        />
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -62,9 +64,10 @@ export const Settings = () => {
               <span>Hard (no visual feedback)</span>
             </label>
           </div>
-          <Button onClick={handleClose}>Ok</Button>
+          <Button onClick={handleClose} data-cy="close-settings">
+            Ok
+          </Button>
         </div>
-          data-cy="close-settings"
       </DialogContent>
     </Dialog>
   );
