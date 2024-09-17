@@ -10,7 +10,7 @@ import "./globals.css";
 const ps2 = Press_Start_2P({ subsets: ["latin"], weight: ["400"] });
 
 export const metadata: Metadata = {
-  title: "Mathler React",
+  title: "Mathler Arcade",
   description: "A math puzzle game built with React.",
 };
 
@@ -20,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${ps2.className} antialiased`}>
         <ThemeProvider attribute="class">
           <AudioProvider>

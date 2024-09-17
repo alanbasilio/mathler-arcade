@@ -49,7 +49,7 @@ If you feel you have been falsely or unfairly accused of violating this Code of 
 
 ## Contact Info
 
-To report any issues or concerns, please contact the project maintainer, Alan Basilio, at [insert contact email or preferred contact method].
+To report any issues or concerns, please contact the project maintainer, Alan Basilio, at [hi@alanbasilio.com].
 
 ## Scope
 
