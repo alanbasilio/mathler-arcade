@@ -65,8 +65,8 @@ An Arcade-inspired math game.
 
 I would like to express my gratitude to the following individuals and projects that have contributed to making this game possible:
 
-- **Josh Comeau** - Creator of the [use-sound](https://github.com/joshwcomeau/use-sound) library, which greatly enhanced the audio experience in this game.
-- **Rauno Freiberg** - Creator of the [UI Playbook](https://github.com/raunofreiberg/interfaces), which provided inspiring guidelines and best practices for creating intuitive user interfaces.
+- **Josh Comeau** (@joshwcomeau) - Creator of the [use-sound](https://github.com/joshwcomeau/use-sound) library, which greatly enhanced the audio experience in this game.
+- **Rauno Freiberg** (@raunofreiberg) - Creator of the [UI Playbook](https://github.com/raunofreiberg/interfaces), which provided inspiring guidelines and best practices for creating intuitive user interfaces.
 - [**shadcn/ui**](https://github.com/shadcn/ui) - For providing a fantastic collection of accessible and customizable React components that greatly enhanced the user interface of this game.
 - The [**NES.css**](https://github.com/nostalgic-css/NES.css) team - For their nostalgic NES-style CSS Framework that added a delightful retro aesthetic to the game's design.
 
