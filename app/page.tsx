@@ -77,7 +77,7 @@ export default function Mathler() {
             </h1>
           </div>
         ) : (
-          <div className="flex flex-col gap-4 lg:gap-8 p-4 z-10 items-center">
+          <div className="flex flex-col gap-6 p-4 z-10 items-center">
             <div className="text-center space-y-2">
               <div className="flex gap-4 items-center justify-center">
                 <Tutorial />
@@ -86,7 +86,7 @@ export default function Mathler() {
                   onClick={handleTheme}
                 />
                 <h1
-                  className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl italic leading-none tracking-tighter"
+                  className="text-3xl md:text-4xl lg:text-5xl italic leading-none tracking-tighter"
                   data-cy="title"
                 >
                   Mathler

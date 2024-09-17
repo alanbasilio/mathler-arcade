@@ -12,12 +12,16 @@ export const Start = ({ startGame }: StartProps) => (
     >
       Mathler
     </h1>
-    <p className="text-lg md:text-xl lg:text-2xl text-center mb-2">
+    <p
+      className="text-lg md:text-xl lg:text-2xl text-center mb-2"
+      data-cy="subtitle"
+    >
       Ready to crunch some numbers?
     </p>
     <button
       onClick={startGame}
       className="nes-btn is-primary text-lg md:text-xl lg:text-2xl animate-pulse"
+      data-cy="start"
     >
       PRESS TO START
     </button>
