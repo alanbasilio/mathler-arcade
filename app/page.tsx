@@ -3,13 +3,14 @@
 import { GameBoard } from "@/components/game-board";
 import { Keyboard } from "@/components/keyboard";
 import RetroGrid from "@/components/retro-grid";
+import { Settings } from "@/components/settings";
 import { Start } from "@/components/start";
 import { Tutorial } from "@/components/tutorial";
 import { useGame } from "@/hooks/use-game";
 import { useAudio } from "@/providers/audio-provider";
 import { evaluate } from "@/utils/evaluate";
 import { getNumberOfTheDay } from "@/utils/numbers";
-import { Moon, Settings, Sun, Volume2, VolumeOff } from "lucide-react";
+import { Moon, Sun, Volume2, VolumeOff } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { useMediaQuery } from "usehooks-ts";
@@ -90,7 +91,7 @@ export default function Mathler() {
                 >
                   Mathler
                 </h1>
-                <Settings className="lg:absolute lg:right-5 lg:top-5" />
+                <Settings />
                 <AudioIcon
                   onClick={toggleAudio}
                   className="lg:absolute lg:left-5 lg:bottom-5"

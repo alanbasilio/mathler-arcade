@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useGameMode } from "@/providers/game-mode";
 import { cn } from "@/utils/cn";
 import { getFeedbackColor } from "@/utils/feedback";
 import { FeedbackColor } from "@/utils/types";
@@ -18,6 +19,7 @@ export const Keyboard = ({
   activeKey,
   highlightEnter,
 }: KeyboardProps) => {
+  const { mode } = useGameMode();
   const numberKeys = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
   const operatorAndActionKeys = ["Backspace", "+", "-", "*", "/", "Enter"];
 
@@ -26,7 +28,7 @@ export const Keyboard = ({
       <Button
         key={key}
         onClick={() => onKeyPress(key)}
-        variant={getFeedbackColor(feedback[key])}
+        variant={mode === "hard" ? "default" : getFeedbackColor(feedback[key])}
         data-cy={`key-${key}`}
         className={cn({
           "scale-95": activeKey === key,
