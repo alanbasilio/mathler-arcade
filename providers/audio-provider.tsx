@@ -53,7 +53,7 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
           break;
       }
     },
-    [playClick, playWarning, playSuccess, playMcPlus, playBack, playEnter]
+    [playClick, playWarning, playSuccess, playMcPlus, playBack]
   );
 
   const toggleAudio = () => {

@@ -3,8 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { useGameMode } from "@/providers/game-mode";
 import { cn } from "@/utils/cn";
-import { getFeedbackColor } from "@/utils/feedback";
-import { FeedbackColor } from "@/utils/types";
+import { FeedbackColor, getFeedbackColor } from "@/utils/feedback";
 
 const NUMBER_KEYS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
 const OPERATORS_AND_ACTION_KEYS = ["Backspace", "+", "-", "*", "/", "Enter"];
@@ -56,13 +55,9 @@ const KeyboardRow = ({
   );
 };
 
-const renderKeyboardRow = (keys: string[], props: KeyboardProps) => (
-  <KeyboardRow keys={keys} {...props} />
-);
-
 export const Keyboard = (props: KeyboardProps) => (
   <div className="flex flex-col gap-2 items-center">
-    {renderKeyboardRow(NUMBER_KEYS, props)}
-    {renderKeyboardRow(OPERATORS_AND_ACTION_KEYS, props)}
+    <KeyboardRow keys={NUMBER_KEYS} {...props} />
+    <KeyboardRow keys={OPERATORS_AND_ACTION_KEYS} {...props} />
   </div>
 );

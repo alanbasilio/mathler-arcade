@@ -2,9 +2,8 @@ import { Guess } from "@/components/game-board";
 import { useToast } from "@/hooks/use-toast";
 import { useAudio } from "@/providers/audio-provider";
 import { evaluate } from "@/utils/evaluate";
-import { getFeedback } from "@/utils/feedback";
+import { FeedbackColor, getFeedback } from "@/utils/feedback";
 import { getNumberOfTheDay } from "@/utils/numbers";
-import { FeedbackColor } from "@/utils/types";
 import { useCallback, useState } from "react";
 
 const targetEquation = getNumberOfTheDay();

@@ -2,8 +2,7 @@
 
 import { useGameMode } from "@/providers/game-mode";
 import { cn } from "@/utils/cn";
-import { getFeedbackColor } from "@/utils/feedback";
-import { FeedbackColor } from "@/utils/types";
+import { FeedbackColor, getFeedbackColor } from "@/utils/feedback";
 
 export interface TileProps {
   value: string;
@@ -11,7 +10,7 @@ export interface TileProps {
   index: number;
 }
 
-export const Tile: React.FC<TileProps> = ({ value, color, index }) => {
+export const Tile = ({ value, color, index }: TileProps) => {
   const feedbackColor = getFeedbackColor(color);
   const { mode } = useGameMode();
 
