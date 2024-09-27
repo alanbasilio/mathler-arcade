@@ -19,14 +19,6 @@ interface KeyboardRowProps extends KeyboardProps {
   keys: string[];
 }
 
-const useKeyVariant = (
-  key: string,
-  mode: string,
-  feedback: Record<string, FeedbackColor>
-) => {
-  return mode === "hard" ? "default" : getFeedbackColor(feedback[key]);
-};
-
 const KeyboardRow = ({
   keys,
   onKeyPress,
@@ -41,7 +33,9 @@ const KeyboardRow = ({
         <Button
           key={key}
           onClick={() => onKeyPress(key)}
-          variant={useKeyVariant(key, mode, feedback)}
+          variant={
+            mode === "hard" ? "default" : getFeedbackColor(feedback[key])
+          }
           data-cy={`key-${key}`}
           className={cn({
             "scale-95": activeKey === key,

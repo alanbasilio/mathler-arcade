@@ -124,6 +124,17 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
+    if (!/[+\-*/]/.test(currentGuess)) {
+      playSound("warning");
+      toast({
+        title: "Error",
+        description:
+          "The equation must contain at least one operator (+, -, *, /)!",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const evaluated = evaluate(currentGuess);
     if (evaluated) {
       if (currentGuess === targetEquation) {
