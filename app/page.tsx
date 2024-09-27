@@ -6,10 +6,8 @@ import RetroGrid from "@/components/retro-grid";
 import { Settings } from "@/components/settings";
 import { Start } from "@/components/start";
 import { Tutorial } from "@/components/tutorial";
+import { useAudio } from "@/hooks/use-audio";
 import { useGame } from "@/hooks/use-game";
-import { useAudio } from "@/providers/audio-provider";
-import { evaluate } from "@/utils/evaluate";
-import { getNumberOfTheDay } from "@/utils/numbers";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import { Heart, Moon, MusicIcon, Sun, Volume2, VolumeOff } from "lucide-react";
@@ -17,9 +15,6 @@ import { useTheme } from "next-themes";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useMediaQuery } from "usehooks-ts";
-
-const targetEquation = getNumberOfTheDay();
-const targetResult = evaluate(targetEquation);
 
 export default function Mathler() {
   const { theme, setTheme } = useTheme();
@@ -32,6 +27,7 @@ export default function Mathler() {
     keyboardFeedback,
     handleKeyPress,
     startGame,
+    targetResult,
   } = useGame();
   const { stopAudio, toggleAudio, playSound } = useAudio();
   const isDesktop = useMediaQuery("(min-width: 768px)");

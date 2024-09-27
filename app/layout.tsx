@@ -1,6 +1,6 @@
 import { Toaster } from "@/components/ui/toaster";
 import { AudioProvider } from "@/providers/audio-provider";
-import { GameModeProvider } from "@/providers/game-mode";
+import { GameProvider } from "@/providers/game-provider";
 import "nes.css/css/nes.min.css";
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
@@ -24,10 +24,10 @@ export default function RootLayout({
       <body className={`${ps2.className} antialiased`}>
         <ThemeProvider attribute="class">
           <AudioProvider>
-            <GameModeProvider>
+            <GameProvider>
               {children}
               <Toaster />
-            </GameModeProvider>
+            </GameProvider>
           </AudioProvider>
         </ThemeProvider>
       </body>

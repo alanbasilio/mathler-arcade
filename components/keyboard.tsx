@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useGameMode } from "@/providers/game-mode";
+import { useGame } from "@/hooks/use-game";
 import { cn } from "@/utils/cn";
 import { FeedbackColor, getFeedbackColor } from "@/utils/feedback";
 
@@ -34,7 +34,7 @@ const KeyboardRow = ({
   activeKey,
   highlightEnter,
 }: KeyboardRowProps) => {
-  const { mode } = useGameMode();
+  const { mode } = useGame();
   return (
     <div className="flex gap-2 flex-wrap justify-center">
       {keys.map((key) => (

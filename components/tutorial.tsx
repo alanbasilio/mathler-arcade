@@ -8,7 +8,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useAudio } from "@/providers/audio-provider";
+import { useAudio } from "@/hooks/use-audio";
 import { Info } from "lucide-react";
 
 export const Tutorial = () => {

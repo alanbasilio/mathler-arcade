@@ -1,6 +1,6 @@
 "use client";
 
-import { useGameMode } from "@/providers/game-mode";
+import { useGame } from "@/hooks/use-game";
 import { cn } from "@/utils/cn";
 import { FeedbackColor, getFeedbackColor } from "@/utils/feedback";
 
@@ -12,7 +12,7 @@ export interface TileProps {
 
 export const Tile = ({ value, color, index }: TileProps) => {
   const feedbackColor = getFeedbackColor(color);
-  const { mode } = useGameMode();
+  const { mode } = useGame();
 
   return (
     <div

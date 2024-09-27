@@ -7,15 +7,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useAudio } from "@/providers/audio-provider";
-import { useGameMode } from "@/providers/game-mode";
+import { useAudio } from "@/hooks/use-audio";
+import { useGame } from "@/hooks/use-game";
 import { SettingsIcon } from "lucide-react";
 import { useState } from "react";
 import { Button } from "./ui/button";
 
 export const Settings = () => {
   const { playSound } = useAudio();
-  const { mode, setMode } = useGameMode();
+  const { mode, setMode } = useGame();
   const handleClick = () => playSound("click");
   const [open, setOpen] = useState<boolean>(false);
 

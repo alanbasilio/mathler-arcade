@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  createContext,
-  ReactNode,
-  useCallback,
-  useContext,
-  useState,
-} from "react";
+import { createContext, ReactNode, useCallback, useState } from "react";
 import useSound from "use-sound";
 
 type Sound = "click" | "warning" | "success" | "mc-plus" | "back";
@@ -17,7 +11,9 @@ interface AudioContextProps {
   playSound: (sound: Sound) => void;
 }
 
-const AudioContext = createContext<AudioContextProps | undefined>(undefined);
+export const AudioContext = createContext<AudioContextProps | undefined>(
+  undefined
+);
 
 export const AudioProvider = ({ children }: { children: ReactNode }) => {
   const [stopAudio, setStopAudio] = useState<boolean>(false);
@@ -66,12 +62,4 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
       {children}
     </AudioContext.Provider>
   );
-};
-
-export const useAudio = () => {
-  const context = useContext(AudioContext);
-  if (!context) {
-    throw new Error("useAudio must be used within an AudioProvider");
-  }
-  return context;
 };
