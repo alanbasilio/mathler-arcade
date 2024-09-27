@@ -39,10 +39,13 @@ export const GameContent = () => {
       <div className="text-center space-y-2">
         <div className="flex gap-4 items-center justify-center">
           <Tutorial />
-          <ThemeToggleIcon
-            className="lg:absolute lg:right-5 lg:bottom-5"
+          <Link
+            href="#"
             onClick={handleThemeToggle}
-          />
+            className="hover:text-foreground"
+          >
+            <ThemeToggleIcon className="lg:absolute lg:right-5 lg:bottom-5" />
+          </Link>
           <h1
             className="text-3xl md:text-4xl lg:text-5xl italic leading-none tracking-tighter"
             data-cy="title"
@@ -50,10 +53,13 @@ export const GameContent = () => {
             Mathler
           </h1>
           <Settings />
-          <AudioIcon
+          <Link
+            href="#"
             onClick={toggleAudio}
-            className="lg:absolute lg:left-5 lg:bottom-5"
-          />
+            className="hover:text-foreground"
+          >
+            <AudioIcon className="lg:absolute lg:left-5 lg:bottom-5" />
+          </Link>
         </div>
         <h2
           className="text-xs lg:text-base leading-none tracking-tighter"
