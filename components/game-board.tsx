@@ -10,11 +10,6 @@ interface GameBoardTileProps {
   index: number;
 }
 
-interface GameBoardProps {
-  guesses: Guess[];
-  currentGuess: string;
-}
-
 export interface Guess {
   tiles: GameBoardTileProps[];
 }
@@ -104,13 +99,17 @@ const renderRow = (
   );
 };
 
-export const GameBoard = ({ guesses, currentGuess }: GameBoardProps) => (
-  <div
-    className="grid grid-rows-6 gap-2 bg-background/20 backdrop-blur-sm border-4 border-foreground p-2"
-    data-cy="grid"
-  >
-    {Array.from({ length: ROWS }, (_, rowIndex) =>
-      renderRow(rowIndex, guesses, currentGuess)
-    )}
-  </div>
-);
+export const GameBoard = () => {
+  const { guesses, currentGuess } = useGame();
+
+  return (
+    <div
+      className="grid grid-rows-6 gap-2 bg-background/20 backdrop-blur-sm border-4 border-foreground p-2"
+      data-cy="grid"
+    >
+      {Array.from({ length: ROWS }, (_, rowIndex) =>
+        renderRow(rowIndex, guesses, currentGuess)
+      )}
+    </div>
+  );
+};
