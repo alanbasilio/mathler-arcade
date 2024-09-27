@@ -118,7 +118,7 @@ export const GameContent = () => {
         </Link>
         |
         <Link
-          href="https://www.alanbasilio.com"
+          href="https://alanbasilio.com"
           target="_blank"
           className="text-xs flex items-center gap-2"
         >
