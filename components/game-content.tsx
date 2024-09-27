@@ -14,15 +14,7 @@ import { useMediaQuery } from "usehooks-ts";
 
 export const GameContent = () => {
   const { theme, setTheme } = useTheme();
-  const {
-    guesses,
-    currentGuess,
-    gameWon,
-    keyboardFeedback,
-    handleKeyPress,
-    targetResult,
-    activeKey,
-  } = useGame();
+  const { gameWon, targetResult } = useGame();
   const { stopAudio, toggleAudio, playSound } = useAudio();
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
@@ -82,13 +74,8 @@ export const GameContent = () => {
           )}
         </h2>
       </div>
-      <GameBoard guesses={guesses} currentGuess={currentGuess} />
-      <Keyboard
-        onKeyPress={handleKeyPress}
-        feedback={keyboardFeedback}
-        activeKey={activeKey}
-        highlightEnter={currentGuess.length === 6}
-      />
+      <GameBoard />
+      <Keyboard />
       {gameWon && (
         <p
           className="mt-4 text-success font-bold text-center"
