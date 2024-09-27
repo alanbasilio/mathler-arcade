@@ -8,17 +8,26 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useAudio } from "@/providers/audio-provider";
+import { useAudio } from "@/hooks/use-audio";
 import { Info } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
 
 export const Tutorial = () => {
   const { playSound } = useAudio();
-  const handleClick = () => playSound("click");
+  const [open, setOpen] = useState<boolean>(false);
+
+  const handleOpenChange = () => {
+    playSound("click");
+    setOpen(!open);
+  };
 
   return (
-    <Dialog>
-      <DialogTrigger asChild onClick={handleClick}>
-        <Info className="lg:absolute lg:left-5 lg:top-5" />
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogTrigger onClick={handleOpenChange} asChild>
+        <Link href="#" className="hover:text-foreground">
+          <Info className="lg:absolute lg:left-5 lg:top-5" />
+        </Link>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

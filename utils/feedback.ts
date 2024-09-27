@@ -1,4 +1,4 @@
-import { FeedbackColor } from "./types";
+export type FeedbackColor = "accent" | "warning" | "success" | "default";
 
 export const getFeedbackColor = (color?: FeedbackColor): FeedbackColor => {
   return color ?? "default";

@@ -1,10 +1,12 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useGameMode } from "@/providers/game-mode";
+import { useGame } from "@/hooks/use-game";
 import { cn } from "@/utils/cn";
-import { getFeedbackColor } from "@/utils/feedback";
-import { FeedbackColor } from "@/utils/types";
+import { FeedbackColor, getFeedbackColor } from "@/utils/feedback";
+
+const NUMBER_KEYS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
+const OPERATORS_AND_ACTION_KEYS = ["Backspace", "+", "-", "*", "/", "Enter"];
 
 interface KeyboardProps {
   onKeyPress: (key: string) => void;
@@ -13,40 +15,43 @@ interface KeyboardProps {
   highlightEnter: boolean;
 }
 
-export const Keyboard = ({
+interface KeyboardRowProps extends KeyboardProps {
+  keys: string[];
+}
+
+const KeyboardRow = ({
+  keys,
   onKeyPress,
   feedback,
   activeKey,
   highlightEnter,
-}: KeyboardProps) => {
-  const { mode } = useGameMode();
-  const numberKeys = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
-  const operatorAndActionKeys = ["Backspace", "+", "-", "*", "/", "Enter"];
-
-  const renderKeys = (keys: string[]) =>
-    keys.map((key) => (
-      <Button
-        key={key}
-        onClick={() => onKeyPress(key)}
-        variant={mode === "hard" ? "default" : getFeedbackColor(feedback[key])}
-        data-cy={`key-${key}`}
-        className={cn({
-          "scale-95": activeKey === key,
-          "animate-pulse": highlightEnter && key === "Enter",
-        })}
-      >
-        {key === "Backspace" ? "Delete" : key}
-      </Button>
-    ));
-
+}: KeyboardRowProps) => {
+  const { mode } = useGame();
   return (
-    <div className="flex flex-col gap-2 items-center">
-      <div className="flex gap-2 flex-wrap justify-center">
-        {renderKeys(numberKeys)}
-      </div>
-      <div className="flex gap-2 flex-wrap justify-center">
-        {renderKeys(operatorAndActionKeys)}
-      </div>
+    <div className="flex gap-2 flex-wrap justify-center">
+      {keys.map((key) => (
+        <Button
+          key={key}
+          onClick={() => onKeyPress(key)}
+          variant={
+            mode === "hard" ? "default" : getFeedbackColor(feedback[key])
+          }
+          data-cy={`key-${key}`}
+          className={cn({
+            "scale-95": activeKey === key,
+            "animate-pulse": highlightEnter && key === "Enter",
+          })}
+        >
+          {key === "Backspace" ? "Delete" : key}
+        </Button>
+      ))}
     </div>
   );
 };
+
+export const Keyboard = (props: KeyboardProps) => (
+  <div className="flex flex-col gap-2 items-center">
+    <KeyboardRow keys={NUMBER_KEYS} {...props} />
+    <KeyboardRow keys={OPERATORS_AND_ACTION_KEYS} {...props} />
+  </div>
+);

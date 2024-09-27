@@ -1,77 +1,64 @@
 "use client";
 
-import React, { createContext, useCallback, useContext, useState } from "react";
+import { createContext, ReactNode, useCallback, useState } from "react";
 import useSound from "use-sound";
+
+type Sound = "click" | "warning" | "success" | "start" | "back";
 
 interface AudioContextProps {
   stopAudio: boolean;
   toggleAudio: () => void;
-  playSound: (
-    sound: "click" | "warning" | "success" | "mc-plus" | "back" | "enter"
-  ) => void;
+  playSound: (sound: Sound) => void;
 }
 
-const AudioContext = createContext<AudioContextProps | undefined>(undefined);
+export const AudioContext = createContext<AudioContextProps | undefined>(
+  undefined
+);
 
-export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const AudioProvider = ({ children }: { children: ReactNode }) => {
   const [stopAudio, setStopAudio] = useState<boolean>(false);
   const audioVolume = stopAudio ? 0 : 0.4;
-  const mcPlusAudioVolume = stopAudio ? 0 : 0.05;
+  const startAudioVolume = stopAudio ? 0 : 0.05;
 
-  const [playEnter] = useSound("/mp3/enter.mp3", { volume: audioVolume });
-  const [playBack] = useSound("/mp3/back.mp3", { volume: audioVolume });
-  const [playClick] = useSound("/mp3/click.mp3", { volume: audioVolume });
-  const [playWarning] = useSound("/mp3/warning.mp3", { volume: audioVolume });
-  const [playSuccess] = useSound("/mp3/success.mp3", { volume: audioVolume });
-  const [playMcPlus] = useSound("/mp3/mc-plus.mp3", {
-    volume: mcPlusAudioVolume,
+  const soundFiles = {
+    click: "/mp3/click.mp3",
+    warning: "/mp3/warning.mp3",
+    success: "/mp3/success.mp3",
+    start: "/mp3/mc-plus.mp3",
+    back: "/mp3/back.mp3",
+  };
+
+  const [playClick] = useSound(soundFiles.click, { volume: audioVolume });
+  const [playWarning] = useSound(soundFiles.warning, { volume: audioVolume });
+  const [playSuccess] = useSound(soundFiles.success, { volume: audioVolume });
+  const [playMcPlus] = useSound(soundFiles.start, {
+    volume: startAudioVolume,
     loop: true,
   });
+  const [playBack] = useSound(soundFiles.back, { volume: audioVolume });
 
   const playSound = useCallback(
-    (sound: "click" | "warning" | "success" | "mc-plus" | "back" | "enter") => {
-      switch (sound) {
-        case "click":
-          playClick();
-          break;
-        case "back":
-          playBack();
-          break;
-        case "enter":
-          playEnter();
-          break;
-        case "warning":
-          playWarning();
-          break;
-        case "success":
-          playSuccess();
-          break;
-        case "mc-plus":
-          playMcPlus();
-          break;
-      }
+    (sound: Sound) => {
+      const soundMap: { [key in Sound]: () => void } = {
+        click: playClick,
+        warning: playWarning,
+        success: playSuccess,
+        start: playMcPlus,
+        back: playBack,
+      };
+      soundMap[sound]();
     },
-    [playClick, playWarning, playSuccess, playMcPlus, playBack, playEnter]
+    [playClick, playWarning, playSuccess, playMcPlus, playBack]
   );
 
-  const toggleAudio = () => {
+  const toggleAudio = useCallback(() => {
     playSound("click");
-    setStopAudio(!stopAudio);
-  };
+    setStopAudio((prevStopAudio) => !prevStopAudio);
+  }, [playSound]);
 
   return (
     <AudioContext.Provider value={{ stopAudio, toggleAudio, playSound }}>
       {children}
     </AudioContext.Provider>
   );
-};
-
-export const useAudio = () => {
-  const context = useContext(AudioContext);
-  if (!context) {
-    throw new Error("useAudio must be used within an AudioProvider");
-  }
-  return context;
 };

@@ -7,16 +7,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useAudio } from "@/providers/audio-provider";
-import { useGameMode } from "@/providers/game-mode";
+import { useAudio } from "@/hooks/use-audio";
+import { useGame } from "@/hooks/use-game";
 import { SettingsIcon } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import { Button } from "./ui/button";
 
 export const Settings = () => {
   const { playSound } = useAudio();
-  const { mode, setMode } = useGameMode();
-  const handleClick = () => playSound("click");
+  const { mode, setMode } = useGame();
   const [open, setOpen] = useState<boolean>(false);
 
   const handleModeChange = (newMode: string) => {
@@ -24,15 +24,20 @@ export const Settings = () => {
     playSound("click");
   };
 
-  const handleClose = () => setOpen(!open);
+  const handleOpenChange = () => {
+    playSound("click");
+    setOpen(!open);
+  };
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
-      <DialogTrigger asChild onClick={handleClick}>
-        <SettingsIcon
-          data-cy="settings-icon"
-          className="lg:absolute lg:right-5 lg:top-5"
-        />
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogTrigger asChild onClick={handleOpenChange}>
+        <Link href="#" className="hover:text-foreground">
+          <SettingsIcon
+            data-cy="settings-icon"
+            className="lg:absolute lg:right-5 lg:top-5"
+          />
+        </Link>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -64,7 +69,7 @@ export const Settings = () => {
               <span>Hard (no visual feedback)</span>
             </label>
           </div>
-          <Button onClick={handleClose} data-cy="close-settings">
+          <Button onClick={handleOpenChange} data-cy="close-settings">
             Ok
           </Button>
         </div>
