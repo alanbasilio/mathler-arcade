@@ -1,10 +1,13 @@
 "use client";
 
-import { Tile, TileProps } from "@/components/tile";
+import { useGame } from "@/hooks/use-game";
 import { cn } from "@/utils/cn";
+import { FeedbackColor, getFeedbackColor } from "@/utils/feedback";
 
-export interface Guess {
-  tiles: TileProps[];
+interface GameBoardTileProps {
+  value: string;
+  color?: FeedbackColor;
+  index: number;
 }
 
 interface GameBoardProps {
@@ -12,10 +15,35 @@ interface GameBoardProps {
   currentGuess: string;
 }
 
+export interface Guess {
+  tiles: GameBoardTileProps[];
+}
+
+const GameBoardTile = ({ value, color, index }: GameBoardTileProps) => {
+  const feedbackColor = getFeedbackColor(color);
+  const { mode } = useGame();
+
+  return (
+    <div
+      className={cn(
+        "w-8 md:w-10 aspect-square flex items-center justify-center text-sm md:text-base lg:text-lg xl:text-2xl font-bold border-foreground border-4 shadow-lg",
+        {
+          "bg-success": mode === "normal" && feedbackColor === "success",
+          "bg-warning": mode === "normal" && feedbackColor === "warning",
+          "bg-accent": mode === "normal" && feedbackColor === "accent",
+        }
+      )}
+      data-cy={`tile-${index}`}
+    >
+      {value}
+    </div>
+  );
+};
+
 const ROWS = 6;
 const COLUMNS = 6;
 
-const renderTile = (
+const getTileValue = (
   rowIndex: number,
   columnIndex: number,
   guesses: Guess[],
@@ -25,23 +53,35 @@ const renderTile = (
   const isCurrentRow = rowIndex === guesses.length;
   const isFilled = Boolean(guess);
 
-  const tileValue = isFilled
+  return isFilled
     ? guess.tiles[columnIndex].value
     : isCurrentRow
     ? currentGuess[columnIndex] || ""
     : "";
-
-  const tileColor = isFilled ? guess.tiles[columnIndex].color : undefined;
-
-  return (
-    <Tile
-      key={columnIndex}
-      value={tileValue}
-      color={tileColor}
-      index={columnIndex}
-    />
-  );
 };
+
+const getTileColor = (
+  rowIndex: number,
+  columnIndex: number,
+  guesses: Guess[]
+) => {
+  const guess = guesses[rowIndex];
+  return guess ? guess.tiles[columnIndex].color : undefined;
+};
+
+const renderTile = (
+  rowIndex: number,
+  columnIndex: number,
+  guesses: Guess[],
+  currentGuess: string
+) => (
+  <GameBoardTile
+    key={columnIndex}
+    value={getTileValue(rowIndex, columnIndex, guesses, currentGuess)}
+    color={getTileColor(rowIndex, columnIndex, guesses)}
+    index={columnIndex}
+  />
+);
 
 const renderRow = (
   rowIndex: number,

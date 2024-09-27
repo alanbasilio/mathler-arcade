@@ -6,22 +6,29 @@ import { useToast } from "@/hooks/use-toast";
 import { evaluate } from "@/utils/evaluate";
 import { FeedbackColor, getFeedback } from "@/utils/feedback";
 import { getNumberOfTheDay } from "@/utils/numbers";
-import { createContext, ReactNode, useCallback, useState } from "react";
+import {
+  createContext,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 
 type GameMode = "normal" | "hard";
 
 interface GameContextProps {
   mode: GameMode;
   setMode: (mode: GameMode) => void;
-  playGame: boolean;
+  gameStarted: boolean;
   guesses: Guess[];
   currentGuess: string;
   gameOver: boolean;
-  winGame: boolean;
+  gameWon: boolean;
   keyboardFeedback: Record<string, FeedbackColor>;
   handleKeyPress: (key: string) => void;
   startGame: () => void;
   targetResult: number;
+  activeKey: string;
 }
 
 export const GameContext = createContext<GameContextProps | undefined>(
@@ -33,27 +40,35 @@ const targetResult = evaluate(targetEquation);
 
 export const GameProvider = ({ children }: { children: ReactNode }) => {
   const [mode, setMode] = useState<GameMode>("normal");
-  const [playGame, setPlayGame] = useState<boolean>(false);
+  const [gameStarted, setGameStarted] = useState<boolean>(false);
   const [guesses, setGuesses] = useState<Guess[]>([]);
   const [currentGuess, setCurrentGuess] = useState<string>("");
   const [gameOver, setGameOver] = useState<boolean>(false);
-  const [winGame, setWinGame] = useState<boolean>(false);
+  const [gameWon, setGameWon] = useState<boolean>(false);
   const [keyboardFeedback, setKeyboardFeedback] = useState<
     Record<string, FeedbackColor>
   >({});
   const { toast } = useToast();
   const { playSound } = useAudio();
+  const [activeKey, setActiveKey] = useState<string>("");
+
+  useEffect(() => {
+    if (activeKey) {
+      const timer = setTimeout(() => setActiveKey(""), 100);
+      return () => clearTimeout(timer);
+    }
+  }, [activeKey]);
 
   const startGame = useCallback(() => {
-    setPlayGame(true);
+    setGameStarted(true);
     playSound("start");
   }, [playSound]);
 
   const handleKeyPress = useCallback(
     (key: string) => {
-      if (gameOver || winGame) return;
+      if (gameOver || gameWon) return;
 
-      if (!playGame) {
+      if (!gameStarted) {
         if (key === "Enter") {
           startGame();
         }
@@ -70,8 +85,21 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
         setCurrentGuess((prev) => prev + key);
       }
     },
-    [currentGuess, gameOver, playSound, playGame, winGame, startGame]
+    [currentGuess, gameOver, playSound, gameStarted, gameWon, startGame]
   );
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const validKeys = ["Enter", "Backspace", ...Array.from("0123456789+-*/")];
+      if (validKeys.includes(event.key)) {
+        handleKeyPress(event.key);
+        setActiveKey(event.key);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyPress]);
 
   const handleSubmitGuess = useCallback(() => {
     if (currentGuess.length < 6) {
@@ -100,7 +128,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     if (evaluated) {
       if (currentGuess === targetEquation) {
         playSound("success");
-        setWinGame(true);
+        setGameWon(true);
         return;
       }
       if (evaluated !== targetResult) {
@@ -178,15 +206,16 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
       value={{
         mode,
         setMode,
-        playGame,
+        gameStarted,
         guesses,
         currentGuess,
         gameOver,
-        winGame,
+        gameWon,
         keyboardFeedback,
         handleKeyPress,
         startGame,
         targetResult,
+        activeKey,
       }}
     >
       {children}
