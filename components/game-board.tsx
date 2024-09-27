@@ -12,47 +12,65 @@ interface GameBoardProps {
   currentGuess: string;
 }
 
-export const GameBoard = ({ guesses, currentGuess }: GameBoardProps) => {
+const ROWS = 6;
+const COLUMNS = 6;
+
+const renderTile = (
+  rowIndex: number,
+  columnIndex: number,
+  guesses: Guess[],
+  currentGuess: string
+) => {
+  const guess = guesses[rowIndex];
+  const isCurrentRow = rowIndex === guesses.length;
+  const isFilled = Boolean(guess);
+
+  const tileValue = isFilled
+    ? guess.tiles[columnIndex].value
+    : isCurrentRow
+    ? currentGuess[columnIndex] || ""
+    : "";
+
+  const tileColor = isFilled ? guess.tiles[columnIndex].color : undefined;
+
+  return (
+    <Tile
+      key={columnIndex}
+      value={tileValue}
+      color={tileColor}
+      index={columnIndex}
+    />
+  );
+};
+
+const renderRow = (
+  rowIndex: number,
+  guesses: Guess[],
+  currentGuess: string
+) => {
+  const isCurrentRow = rowIndex === guesses.length;
+  const isFilled = Boolean(guesses[rowIndex]);
+
   return (
     <div
-      className="grid grid-rows-6 gap-2 bg-background/20 backdrop-blur-sm border-4 border-foreground p-2"
-      data-cy="grid"
+      key={rowIndex}
+      className={cn("flex gap-2", !isFilled && !isCurrentRow && "opacity-50")}
+      data-cy={`row-${rowIndex}`}
     >
-      {Array(6)
-        .fill("")
-        .map((_, rowIndex) => {
-          const guess = guesses[rowIndex];
-          const isCurrentRow = rowIndex === guesses.length;
-          const isFilled = Boolean(guess);
-
-          return (
-            <div
-              key={rowIndex}
-              className={cn(
-                "flex gap-2",
-                !isFilled && !isCurrentRow && "opacity-50"
-              )}
-              data-cy={`row-${rowIndex}`}
-            >
-              {Array(6)
-                .fill("")
-                .map((_, index) => (
-                  <Tile
-                    key={index}
-                    value={
-                      isFilled
-                        ? guess.tiles[index].value
-                        : isCurrentRow
-                        ? currentGuess[index] || ""
-                        : ""
-                    }
-                    color={isFilled ? guess.tiles[index].color : undefined}
-                    index={index}
-                  />
-                ))}
-            </div>
-          );
-        })}
+      {Array.from({ length: COLUMNS }, (_, columnIndex) =>
+        renderTile(rowIndex, columnIndex, guesses, currentGuess)
+      )}
     </div>
   );
 };
+
+export const GameBoard = ({ guesses, currentGuess }: GameBoardProps) => (
+  <div
+    className="grid grid-rows-6 gap-2 bg-background/20 backdrop-blur-sm border-4 border-foreground p-2"
+    data-cy="grid"
+  >
+    {Array.from({ length: ROWS }, (_, rowIndex) =>
+      renderRow(rowIndex, guesses, currentGuess)
+    )}
+  </div>
+);

@@ -1,26 +1,29 @@
 "use client";
 
-import React, { createContext, useCallback, useContext, useState } from "react";
+import {
+  createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useState,
+} from "react";
 import useSound from "use-sound";
+
+type Sound = "click" | "warning" | "success" | "mc-plus" | "back";
 
 interface AudioContextProps {
   stopAudio: boolean;
   toggleAudio: () => void;
-  playSound: (
-    sound: "click" | "warning" | "success" | "mc-plus" | "back" | "enter"
-  ) => void;
+  playSound: (sound: Sound) => void;
 }
 
 const AudioContext = createContext<AudioContextProps | undefined>(undefined);
 
-export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const AudioProvider = ({ children }: { children: ReactNode }) => {
   const [stopAudio, setStopAudio] = useState<boolean>(false);
   const audioVolume = stopAudio ? 0 : 0.4;
   const mcPlusAudioVolume = stopAudio ? 0 : 0.05;
 
-  const [playEnter] = useSound("/mp3/enter.mp3", { volume: audioVolume });
   const [playBack] = useSound("/mp3/back.mp3", { volume: audioVolume });
   const [playClick] = useSound("/mp3/click.mp3", { volume: audioVolume });
   const [playWarning] = useSound("/mp3/warning.mp3", { volume: audioVolume });
@@ -31,16 +34,13 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
   });
 
   const playSound = useCallback(
-    (sound: "click" | "warning" | "success" | "mc-plus" | "back" | "enter") => {
+    (sound: Sound) => {
       switch (sound) {
         case "click":
           playClick();
           break;
         case "back":
           playBack();
-          break;
-        case "enter":
-          playEnter();
           break;
         case "warning":
           playWarning();
