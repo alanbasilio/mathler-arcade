@@ -44,10 +44,10 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
   const { toast } = useToast();
   const { playSound } = useAudio();
 
-  const startGame = () => {
+  const startGame = useCallback(() => {
     setPlayGame(true);
-    playSound("mc-plus");
-  };
+    playSound("start");
+  }, [playSound]);
 
   const handleKeyPress = useCallback(
     (key: string) => {
@@ -70,7 +70,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
         setCurrentGuess((prev) => prev + key);
       }
     },
-    [currentGuess, gameOver, playSound, playGame]
+    [currentGuess, gameOver, playSound, playGame, winGame, startGame]
   );
 
   const handleSubmitGuess = useCallback(() => {
@@ -86,12 +86,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
 
     if (guesses.length >= 6 || gameOver) return;
 
-    if (
-      guesses.some(
-        (guess) =>
-          guess.tiles.map((tile) => tile.value).join("") === currentGuess
-      )
-    ) {
+    if (isDuplicateGuess()) {
       playSound("warning");
       toast({
         title: "Oh no!",
@@ -117,22 +112,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
         });
         return;
       }
-      const feedback = getFeedback(currentGuess, targetEquation);
-
-      const newGuess: Guess = {
-        tiles: currentGuess.split("").map((char, index) => ({
-          value: char,
-          color: feedback[index],
-          index,
-        })),
-      };
-
-      setGuesses((prevGuesses) => [...prevGuesses, newGuess]);
-      updateKeyboardFeedback(currentGuess, feedback);
-      setCurrentGuess("");
-      if (guesses.length + 1 >= 6) {
-        setGameOver(true);
-      }
+      processValidGuess();
     } else {
       playSound("warning");
       toast({
@@ -142,6 +122,31 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
       });
     }
   }, [currentGuess, gameOver, guesses, toast, playSound]);
+
+  const isDuplicateGuess = useCallback(() => {
+    return guesses.some(
+      (guess) => guess.tiles.map((tile) => tile.value).join("") === currentGuess
+    );
+  }, [currentGuess, guesses]);
+
+  const processValidGuess = useCallback(() => {
+    const feedback = getFeedback(currentGuess, targetEquation);
+
+    const newGuess: Guess = {
+      tiles: currentGuess.split("").map((char, index) => ({
+        value: char,
+        color: feedback[index],
+        index,
+      })),
+    };
+
+    setGuesses((prevGuesses) => [...prevGuesses, newGuess]);
+    updateKeyboardFeedback(currentGuess, feedback);
+    setCurrentGuess("");
+    if (guesses.length + 1 >= 6) {
+      setGameOver(true);
+    }
+  }, [currentGuess, guesses]);
 
   const updateKeyboardFeedback = useCallback(
     (guess: string, feedback: FeedbackColor[]) => {
