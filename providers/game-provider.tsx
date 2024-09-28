@@ -128,7 +128,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
-    if (!/[+\-*/]/.test(currentGuess)) {
+    if (!containsOperator()) {
       playSound("warning");
       toast({
         title: "Error",
@@ -140,8 +140,9 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     }
 
     const evaluatedGuess = evaluate(currentGuess);
-    const isValidEquation = isValidEquationWithoutZero(currentGuess);
-    if (evaluatedGuess && isValidEquation) {
+    const isValidEquation =
+      evaluatedGuess !== 0 && isValidEquationWithoutZero(currentGuess);
+    if (isValidEquation) {
       if (
         targetResult === evaluatedGuess &&
         isCumulativeSolution(currentGuess.split(""), targetEquation.split(""))
@@ -159,7 +160,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
         });
         return;
       }
-      processValidGuess();
+      processValidGuessFeedback();
     } else {
       playSound("warning");
       toast({
@@ -170,13 +171,17 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [currentGuess, gameOver, guesses, toast, playSound]);
 
+  const containsOperator = useCallback(() => {
+    return /[+\-*/]/.test(currentGuess);
+  }, [currentGuess]);
+
   const isDuplicateGuess = useCallback(() => {
     return guesses.some(
       (guess) => guess.tiles.map((tile) => tile.value).join("") === currentGuess
     );
   }, [currentGuess, guesses]);
 
-  const processValidGuess = useCallback(() => {
+  const processValidGuessFeedback = useCallback(() => {
     const feedback = getFeedback(currentGuess, targetEquation);
 
     const newGuess: Guess = {

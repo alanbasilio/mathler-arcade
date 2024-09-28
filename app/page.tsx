@@ -8,20 +8,12 @@ import { useGame } from "@/hooks/use-game";
 import { GoogleAnalytics } from "@next/third-parties/google";
 
 export default function Mathler() {
-  const { gameStarted, gameOver, startGame } = useGame();
+  const { gameStarted, gameOver } = useGame();
 
   return (
     <div className="flex min-h-screen justify-center items-center align-center z-0">
       {!gameOver && <RetroGrid />}
-      {gameStarted ? (
-        gameOver ? (
-          <GameOver />
-        ) : (
-          <GameContent />
-        )
-      ) : (
-        <Start startGame={startGame} />
-      )}
+      {gameStarted ? gameOver ? <GameOver /> : <GameContent /> : <Start />}
       <GoogleAnalytics gaId="G-R20575MFZH" />
     </div>
   );
