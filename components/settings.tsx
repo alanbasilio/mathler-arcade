@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -12,7 +13,6 @@ import { useGame } from "@/hooks/use-game";
 import { SettingsIcon } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { Button } from "./ui/button";
 
 export const Settings = () => {
   const { playSound } = useAudio();
