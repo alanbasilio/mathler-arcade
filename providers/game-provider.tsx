@@ -3,11 +3,7 @@
 import { Guess } from "@/components/game-board";
 import { useAudio } from "@/hooks/use-audio";
 import { useToast } from "@/hooks/use-toast";
-import {
-  evaluate,
-  isCumulativeSolution,
-  isValidEquationWithoutZero,
-} from "@/utils/evaluate";
+import { evaluate, isCumulativeSolution } from "@/utils/evaluate";
 import { FeedbackColor, getFeedback } from "@/utils/feedback";
 import { getNumberOfTheDay } from "@/utils/numbers";
 import {
@@ -140,9 +136,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     }
 
     const evaluatedGuess = evaluate(currentGuess);
-    const isValidEquation =
-      evaluatedGuess !== 0 && isValidEquationWithoutZero(currentGuess);
-    if (isValidEquation) {
+    if (evaluatedGuess) {
       if (
         targetResult === evaluatedGuess &&
         isCumulativeSolution(currentGuess.split(""), targetEquation.split(""))

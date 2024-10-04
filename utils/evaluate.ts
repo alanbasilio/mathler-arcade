@@ -6,11 +6,6 @@ export function evaluate(equation: string): number {
   }
 }
 
-export const isValidEquationWithoutZero = (equation: string): boolean => {
-  const zeroWithOperatorsPattern = /[+\-*\/]0[+\-*\/]|0[+\-*\/]/;
-  return !zeroWithOperatorsPattern.test(equation);
-};
-
 export const isCumulativeSolution = (
   arr1: string[],
   arr2: string[]
