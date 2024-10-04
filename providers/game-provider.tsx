@@ -3,11 +3,7 @@
 import { Guess } from "@/components/game-board";
 import { useAudio } from "@/hooks/use-audio";
 import { useToast } from "@/hooks/use-toast";
-import {
-  evaluate,
-  isCumulativeSolution,
-  isValidEquationWithoutZero,
-} from "@/utils/evaluate";
+import { evaluate, isCumulativeSolution } from "@/utils/evaluate";
 import { FeedbackColor, getFeedback } from "@/utils/feedback";
 import { getNumberOfTheDay } from "@/utils/numbers";
 import {
@@ -128,7 +124,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
-    if (!/[+\-*/]/.test(currentGuess)) {
+    if (!containsOperator()) {
       playSound("warning");
       toast({
         title: "Error",
@@ -140,8 +136,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     }
 
     const evaluatedGuess = evaluate(currentGuess);
-    const isValidEquation = isValidEquationWithoutZero(currentGuess);
-    if (evaluatedGuess && isValidEquation) {
+    if (evaluatedGuess) {
       if (
         targetResult === evaluatedGuess &&
         isCumulativeSolution(currentGuess.split(""), targetEquation.split(""))
@@ -159,7 +154,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
         });
         return;
       }
-      processValidGuess();
+      processValidGuessFeedback();
     } else {
       playSound("warning");
       toast({
@@ -170,13 +165,17 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [currentGuess, gameOver, guesses, toast, playSound]);
 
+  const containsOperator = useCallback(() => {
+    return /[+\-*/]/.test(currentGuess);
+  }, [currentGuess]);
+
   const isDuplicateGuess = useCallback(() => {
     return guesses.some(
       (guess) => guess.tiles.map((tile) => tile.value).join("") === currentGuess
     );
   }, [currentGuess, guesses]);
 
-  const processValidGuess = useCallback(() => {
+  const processValidGuessFeedback = useCallback(() => {
     const feedback = getFeedback(currentGuess, targetEquation);
 
     const newGuess: Guess = {
