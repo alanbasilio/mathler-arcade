@@ -18,7 +18,7 @@ export const AudioContext = createContext<AudioContextProps | undefined>(
 export const AudioProvider = ({ children }: { children: ReactNode }) => {
   const [stopAudio, setStopAudio] = useState<boolean>(false);
   const audioVolume = stopAudio ? 0 : 0.4;
-  const startAudioVolume = stopAudio ? 0 : 0.05;
+  const mcPlusAudioVolume = stopAudio ? 0 : 0.05;
 
   const soundFiles = {
     click: "/mp3/click.mp3",
@@ -32,7 +32,7 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
   const [playWarning] = useSound(soundFiles.warning, { volume: audioVolume });
   const [playSuccess] = useSound(soundFiles.success, { volume: audioVolume });
   const [playMcPlus] = useSound(soundFiles.start, {
-    volume: startAudioVolume,
+    volume: mcPlusAudioVolume,
     loop: true,
   });
   const [playBack] = useSound(soundFiles.back, { volume: audioVolume });
