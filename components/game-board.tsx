@@ -79,7 +79,7 @@ const GameBoardRow = ({ rowIndex }: { rowIndex: number }) => {
 export const GameBoard = () => {
   return (
     <div
-      className="grid grid-rows-6 gap-2 bg-background/20 backdrop-blur-sm border-4 border-foreground p-2"
+      className="grid grid-rows-6 gap-2 bg-background/20 backdrop-blur-xs border-4 border-foreground p-2"
       data-cy="grid"
     >
       {Array.from({ length: ROWS }, (_, rowIndex) => (
