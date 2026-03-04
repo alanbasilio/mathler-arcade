@@ -39,7 +39,7 @@ export const GameContent = () => {
             <ThemeToggleIcon className="lg:absolute lg:right-5 lg:bottom-5" />
           </Link>
           <h1
-            className="text-foreground text-3xl md:text-4xl lg:text-5xl italic leading-none tracking-tighter"
+            className="text-foreground text-3xl md:text-4xl lg:text-5xl xl:text-6xl italic leading-none tracking-tighter"
             data-cy="title"
           >
             Mathler
@@ -77,13 +77,13 @@ export const GameContent = () => {
       <GameBoard />
       <Keyboard />
       {gameWon && (
-        <p
-          className="mt-4 text-success font-bold text-center"
+        <div
+          className="mt-2 px-4 py-3 border-4 border-success bg-success/10 text-success font-bold text-center text-xs md:text-sm animate-pop"
           data-cy="success-message"
         >
           You&apos;ve solved today&apos;s equation! <br />
           Come back tomorrow for a new challenge!
-        </p>
+        </div>
       )}
       <div className="flex items-center gap-2">
         <Button asChild variant="link" size="xs">

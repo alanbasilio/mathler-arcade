@@ -1,46 +1,41 @@
-const defaultMessage = " Using number of the day instead.";
+import { GAME_START_DATE, MS_PER_DAY } from "./constants";
+
+const isValidDate = (date: Date): boolean =>
+  date instanceof Date && !isNaN(date.getTime());
+
+const parseDateParam = (dateParam: string): Date | null => {
+  const day = parseInt(dateParam.slice(0, 2), 10);
+  const month = parseInt(dateParam.slice(2, 4), 10) - 1; // Months are 0-indexed
+  const year = parseInt(dateParam.slice(4), 10);
+
+  if (isNaN(day) || isNaN(month) || isNaN(year)) return null;
+
+  const parsed = new Date(year, month, day);
+  const isExactDate =
+    parsed.getDate() === day &&
+    parsed.getMonth() === month &&
+    parsed.getFullYear() === year;
+
+  return isValidDate(parsed) && isExactDate ? parsed : null;
+};
 
 export function getNumberOfTheDay() {
   const searchParams =
     typeof window !== "undefined"
       ? new URLSearchParams(window.location.search)
       : new URLSearchParams();
-  const dateParam = searchParams.get("date");
 
-  let now = new Date();
+  const dateParam = searchParams.get("date");
+  let referenceDate = new Date();
 
   if (dateParam) {
-    const day = parseInt(dateParam.slice(0, 2), 10);
-    const month = parseInt(dateParam.slice(2, 4), 10) - 1; // Months are 0-indexed
-    const year = parseInt(dateParam.slice(4), 10);
-
-    if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
-      const paramDate = new Date(year, month, day);
-      if (
-        isValidDate(paramDate) &&
-        paramDate.getDate() === day &&
-        paramDate.getMonth() === month &&
-        paramDate.getFullYear() === year
-      ) {
-        now = paramDate;
-      } else {
-        console.log(`Invalid date in URL. ${defaultMessage}`);
-      }
-    } else {
-      console.log(`Malformed date in URL. ${defaultMessage}`);
-    }
+    const parsed = parseDateParam(dateParam);
+    if (parsed) referenceDate = parsed;
   }
 
-  function isValidDate(date: Date): boolean {
-    return date instanceof Date && !isNaN(date.getTime());
-  }
+  const diff = Number(referenceDate) - Number(GAME_START_DATE);
+  const day = Math.floor(diff / MS_PER_DAY) % answers.length;
 
-  const start = new Date(2022, 0, 0);
-  const diff = Number(now) - Number(start);
-  let day = Math.floor(diff / (1000 * 60 * 60 * 24));
-  while (day > answers.length) {
-    day -= answers.length;
-  }
   return answers[day];
 }
 

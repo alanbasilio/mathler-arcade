@@ -2,6 +2,7 @@
 
 import { useGame } from "@/hooks/use-game";
 import { cn } from "@/lib/utils";
+import { EQUATION_LENGTH } from "@/utils/constants";
 import { FeedbackColor, getFeedbackColor } from "@/utils/feedback";
 
 interface GameBoardTileProps {
@@ -14,8 +15,8 @@ export interface Guess {
   tiles: GameBoardTileProps[];
 }
 
-const ROWS = 6;
-const COLUMNS = 6;
+const ROWS = EQUATION_LENGTH;
+const COLUMNS = EQUATION_LENGTH;
 
 const GameBoardTile = ({ value, color, index }: GameBoardTileProps) => {
   const feedbackColor = getFeedbackColor(color);
@@ -24,10 +25,10 @@ const GameBoardTile = ({ value, color, index }: GameBoardTileProps) => {
   return (
     <div
       className={cn(
-        "text-foreground w-8 md:w-10 aspect-square flex items-center justify-center text-sm md:text-base lg:text-lg xl:text-2xl font-bold border-foreground border-4 shadow-lg",
+        "text-foreground w-10 md:w-12 aspect-square flex items-center justify-center text-base md:text-lg lg:text-xl xl:text-2xl font-bold border-foreground border-4 shadow-lg transition-colors duration-300",
         mode === "normal" && {
-          "bg-success": feedbackColor === "success",
-          "bg-warning": feedbackColor === "warning",
+          "bg-success text-success-foreground": feedbackColor === "success",
+          "bg-warning text-warning-foreground": feedbackColor === "warning",
           "bg-accent": feedbackColor === "accent",
         }
       )}

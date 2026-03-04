@@ -19,8 +19,11 @@ export const Settings = () => {
   const { mode, setMode } = useGame();
   const [open, setOpen] = useState<boolean>(false);
 
+  const isGameMode = (value: string): value is "normal" | "hard" =>
+    value === "normal" || value === "hard";
+
   const handleModeChange = (newMode: string) => {
-    setMode(newMode as "normal" | "hard");
+    if (isGameMode(newMode)) setMode(newMode);
     playSound("click");
   };
 
@@ -44,31 +47,33 @@ export const Settings = () => {
           <DialogTitle className="text-foreground">Settings</DialogTitle>
         </DialogHeader>
         <div className="text-foreground flex flex-col gap-4 mt-4">
-          <h3 className="text-base">Difficulty</h3>
-          <div className="flex flex-col">
-            <label>
-              <input
-                type="radio"
-                className="nes-radio"
-                name="difficulty"
-                checked={mode === "normal"}
-                onChange={() => handleModeChange("normal")}
-                data-cy="normal-mode-radio"
-              />
-              <span>Normal</span>
-            </label>
-            <label>
-              <input
-                type="radio"
-                className="nes-radio"
-                name="difficulty"
-                checked={mode === "hard"}
-                onChange={() => handleModeChange("hard")}
-                data-cy="hard-mode-radio"
-              />
-              <span>Hard (no visual feedback)</span>
-            </label>
-          </div>
+          <fieldset className="border-0 p-0 m-0">
+            <legend className="text-base mb-2">Difficulty</legend>
+            <div className="flex flex-col">
+              <label>
+                <input
+                  type="radio"
+                  className="nes-radio"
+                  name="difficulty"
+                  checked={mode === "normal"}
+                  onChange={() => handleModeChange("normal")}
+                  data-cy="normal-mode-radio"
+                />
+                <span>Normal</span>
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  className="nes-radio"
+                  name="difficulty"
+                  checked={mode === "hard"}
+                  onChange={() => handleModeChange("hard")}
+                  data-cy="hard-mode-radio"
+                />
+                <span>Hard (no visual feedback)</span>
+              </label>
+            </div>
+          </fieldset>
           <Button onClick={handleOpenChange} data-cy="close-settings">
             Ok
           </Button>

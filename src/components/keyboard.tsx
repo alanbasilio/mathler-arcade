@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { useGame } from "@/hooks/use-game";
 import { cn } from "@/lib/utils";
+import { EQUATION_LENGTH } from "@/utils/constants";
 import { getFeedbackColor } from "@/utils/feedback";
 
 const NUMBER_KEYS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
@@ -15,7 +16,7 @@ interface KeyboardRowProps {
 const KeyboardRow = ({ keys }: KeyboardRowProps) => {
   const { mode, handleKeyPress, keyboardFeedback, activeKey, currentGuess } =
     useGame();
-  const highlightEnter = currentGuess.length === 6;
+  const highlightEnter = currentGuess.length === EQUATION_LENGTH;
   return (
     <div className="flex gap-2 flex-wrap justify-center">
       {keys.map((key) => (
@@ -28,7 +29,7 @@ const KeyboardRow = ({ keys }: KeyboardRowProps) => {
               : getFeedbackColor(keyboardFeedback[key])
           }
           data-cy={`key-${key}`}
-          className={cn({
+          className={cn("min-h-10 min-w-10", {
             "scale-95": activeKey === key,
             "animate-pulse": highlightEnter && key === "Enter",
           })}

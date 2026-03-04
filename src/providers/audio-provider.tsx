@@ -1,5 +1,6 @@
 "use client";
 
+import { MC_PLUS_VOLUME, STANDARD_VOLUME } from "@/utils/constants";
 import { createContext, ReactNode, useCallback, useState } from "react";
 import useSound from "use-sound";
 
@@ -17,8 +18,8 @@ export const AudioContext = createContext<AudioContextProps | undefined>(
 
 export const AudioProvider = ({ children }: { children: ReactNode }) => {
   const [stopAudio, setStopAudio] = useState<boolean>(false);
-  const audioVolume = stopAudio ? 0 : 0.4;
-  const mcPlusAudioVolume = stopAudio ? 0 : 0.05;
+  const audioVolume = stopAudio ? 0 : STANDARD_VOLUME;
+  const mcPlusAudioVolume = stopAudio ? 0 : MC_PLUS_VOLUME;
 
   const soundFiles = {
     click: "/mp3/click.mp3",

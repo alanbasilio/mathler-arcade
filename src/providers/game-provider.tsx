@@ -2,9 +2,20 @@
 
 import { Guess } from "@/components/game-board";
 import { useAudio } from "@/hooks/use-audio";
+import {
+  ACTIVE_KEY_TIMEOUT_MS,
+  EQUATION_LENGTH,
+  MAX_GUESSES,
+  VALID_KEYS,
+} from "@/utils/constants";
 import { evaluate, isCumulativeSolution } from "@/utils/evaluate";
 import { FeedbackColor, getFeedback } from "@/utils/feedback";
 import { getNumberOfTheDay } from "@/utils/numbers";
+import {
+  isDuplicateGuess,
+  validateGuessLength,
+  validateHasOperator,
+} from "@/utils/validation";
 import {
   createContext,
   ReactNode,
@@ -28,6 +39,7 @@ interface GameContextProps {
   handleKeyPress: (key: string) => void;
   startGame: () => void;
   targetResult: number;
+  targetEquation: string;
   activeKey: string;
 }
 
@@ -36,7 +48,30 @@ export const GameContext = createContext<GameContextProps | undefined>(
 );
 
 const targetEquation = getNumberOfTheDay();
-const targetResult = evaluate(targetEquation);
+const targetResult = evaluate(targetEquation) ?? 0;
+
+const computeKeyboardFeedback = (
+  current: Record<string, FeedbackColor>,
+  guess: string,
+  feedback: FeedbackColor[]
+): Record<string, FeedbackColor> => {
+  const updated = { ...current };
+
+  guess.split("").forEach((char, index) => {
+    const charFeedback = feedback[index];
+    const existing = updated[char];
+
+    if (charFeedback === "success") {
+      updated[char] = "success";
+    } else if (charFeedback === "warning" && existing !== "success") {
+      updated[char] = "warning";
+    } else if (charFeedback === "accent" && !existing) {
+      updated[char] = "accent";
+    }
+  });
+
+  return updated;
+};
 
 export const GameProvider = ({ children }: { children: ReactNode }) => {
   const [mode, setMode] = useState<GameMode>("normal");
@@ -48,14 +83,13 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
   const [keyboardFeedback, setKeyboardFeedback] = useState<
     Record<string, FeedbackColor>
   >({});
-  const { playSound } = useAudio();
   const [activeKey, setActiveKey] = useState<string>("");
+  const { playSound } = useAudio();
 
   useEffect(() => {
-    if (activeKey) {
-      const timer = setTimeout(() => setActiveKey(""), 100);
-      return () => clearTimeout(timer);
-    }
+    if (!activeKey) return;
+    const timer = setTimeout(() => setActiveKey(""), ACTIVE_KEY_TIMEOUT_MS);
+    return () => clearTimeout(timer);
   }, [activeKey]);
 
   const startGame = useCallback(() => {
@@ -63,56 +97,44 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     playSound("start");
   }, [playSound]);
 
-  const handleKeyPress = useCallback(
-    (key: string) => {
-      if (gameOver || gameWon) return;
+  const processValidGuessFeedback = useCallback(
+    (guess: string, currentGuessCount: number) => {
+      const feedback = getFeedback(guess, targetEquation);
 
-      if (!gameStarted) {
-        if (key === "Enter") {
-          startGame();
-        }
-        return;
-      }
+      const newGuess: Guess = {
+        tiles: guess.split("").map((char, index) => ({
+          value: char,
+          color: feedback[index],
+          index,
+        })),
+      };
 
-      if (key === "Enter") {
-        handleSubmitGuess();
-      } else if (key === "Backspace") {
-        playSound("back");
-        setCurrentGuess((prev) => prev.slice(0, -1));
-      } else if (currentGuess.length < 6) {
-        playSound("click");
-        setCurrentGuess((prev) => prev + key);
+      setGuesses((prev) => [...prev, newGuess]);
+      setKeyboardFeedback((prev) =>
+        computeKeyboardFeedback(prev, guess, feedback)
+      );
+      setCurrentGuess("");
+
+      if (currentGuessCount + 1 >= MAX_GUESSES) {
+        setGameOver(true);
       }
     },
-    [currentGuess, gameOver, playSound, gameStarted, gameWon, startGame]
+    []
   );
 
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      const validKeys = ["Enter", "Backspace", ...Array.from("0123456789+-*/")];
-      if (validKeys.includes(event.key)) {
-        handleKeyPress(event.key);
-        setActiveKey(event.key);
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleKeyPress]);
-
   const handleSubmitGuess = useCallback(() => {
-    if (currentGuess.length < 6) {
+    if (!validateGuessLength(currentGuess)) {
       playSound("warning");
-      toast.error('Error', {
-        description: "Fill in all 6 spaces of the equation!",
+      toast.error("Error", {
+        description: `Fill in all ${EQUATION_LENGTH} spaces of the equation!`,
         position: "top-center",
       });
       return;
     }
 
-    if (guesses.length >= 6 || gameOver) return;
+    if (guesses.length >= MAX_GUESSES || gameOver) return;
 
-    if (isDuplicateGuess()) {
+    if (isDuplicateGuess(currentGuess, guesses)) {
       playSound("warning");
       toast.warning("Oh no!", {
         description: "You've already tried this guess. Try a different one!",
@@ -121,7 +143,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
-    if (!containsOperator()) {
+    if (!validateHasOperator(currentGuess)) {
       playSound("warning");
       toast.error("Error", {
         description:
@@ -132,86 +154,75 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     }
 
     const evaluatedGuess = evaluate(currentGuess);
-    if (evaluatedGuess) {
-      if (
-        targetResult === evaluatedGuess &&
-        isCumulativeSolution(currentGuess.split(""), targetEquation.split(""))
-      ) {
-        playSound("success");
-        setGameWon(true);
-        return;
-      }
-      if (evaluatedGuess !== targetResult) {
-        playSound("warning");
-        toast.warning("Warning", {
-          description: `Every guess must result in ${targetResult}. Try again!`,
-          position: "top-center",
-        });
-        return;
-      }
-      processValidGuessFeedback();
-    } else {
+
+    if (evaluatedGuess === null) {
       playSound("warning");
       toast.error("Error", {
         description: "Try a valid equation!",
         position: "top-center",
       });
+      return;
     }
-  }, [currentGuess, gameOver, guesses, toast, playSound]);
 
-  const containsOperator = useCallback(() => {
-    return /[+\-*/]/.test(currentGuess);
-  }, [currentGuess]);
+    if (evaluatedGuess !== targetResult) {
+      playSound("warning");
+      toast.warning("Warning", {
+        description: `Every guess must result in ${targetResult}. Try again!`,
+        position: "top-center",
+      });
+      return;
+    }
 
-  const isDuplicateGuess = useCallback(() => {
-    return guesses.some(
-      (guess) => guess.tiles.map((tile) => tile.value).join("") === currentGuess
-    );
-  }, [currentGuess, guesses]);
+    if (isCumulativeSolution(currentGuess.split(""), targetEquation.split(""))) {
+      playSound("success");
+      setGameWon(true);
+      return;
+    }
 
-  const processValidGuessFeedback = useCallback(() => {
-    const feedback = getFeedback(currentGuess, targetEquation);
+    processValidGuessFeedback(currentGuess, guesses.length);
+  }, [currentGuess, gameOver, guesses, playSound, processValidGuessFeedback]);
 
-    const newGuess: Guess = {
-      tiles: currentGuess.split("").map((char, index) => ({
-        value: char,
-        color: feedback[index],
-        index,
-      })),
+  const handleKeyPress = useCallback(
+    (key: string) => {
+      if (gameOver || gameWon) return;
+
+      if (!gameStarted) {
+        if (key === "Enter") startGame();
+        return;
+      }
+
+      if (key === "Enter") {
+        handleSubmitGuess();
+      } else if (key === "Backspace") {
+        playSound("back");
+        setCurrentGuess((prev) => prev.slice(0, -1));
+      } else if (currentGuess.length < EQUATION_LENGTH) {
+        playSound("click");
+        setCurrentGuess((prev) => prev + key);
+      }
+    },
+    [
+      currentGuess,
+      gameOver,
+      gameStarted,
+      gameWon,
+      handleSubmitGuess,
+      playSound,
+      startGame,
+    ]
+  );
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (VALID_KEYS.includes(event.key)) {
+        handleKeyPress(event.key);
+        setActiveKey(event.key);
+      }
     };
 
-    setGuesses((prevGuesses) => [...prevGuesses, newGuess]);
-    updateKeyboardFeedback(currentGuess, feedback);
-    setCurrentGuess("");
-    if (guesses.length + 1 >= 6) {
-      setGameOver(true);
-    }
-  }, [currentGuess, guesses]);
-
-  const updateKeyboardFeedback = useCallback(
-    (guess: string, feedback: FeedbackColor[]) => {
-      const updatedFeedback = { ...keyboardFeedback };
-
-      guess.split("").forEach((char, index) => {
-        const currentFeedback = feedback[index];
-        const existingFeedback = updatedFeedback[char];
-
-        if (currentFeedback === "success") {
-          updatedFeedback[char] = "success";
-        } else if (
-          currentFeedback === "warning" &&
-          existingFeedback !== "success"
-        ) {
-          updatedFeedback[char] = "warning";
-        } else if (currentFeedback === "accent" && !existingFeedback) {
-          updatedFeedback[char] = "accent";
-        }
-      });
-
-      setKeyboardFeedback(updatedFeedback);
-    },
-    [keyboardFeedback]
-  );
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyPress]);
 
   return (
     <GameContext.Provider
@@ -227,6 +238,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
         handleKeyPress,
         startGame,
         targetResult,
+        targetEquation,
         activeKey,
       }}
     >
