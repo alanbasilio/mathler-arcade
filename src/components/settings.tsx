@@ -41,9 +41,9 @@ export const Settings = () => {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Settings</DialogTitle>
+          <DialogTitle className="text-foreground">Settings</DialogTitle>
         </DialogHeader>
-        <div className="flex flex-col gap-4 mt-4">
+        <div className="text-foreground flex flex-col gap-4 mt-4">
           <h3 className="text-base">Difficulty</h3>
           <div className="flex flex-col">
             <label>

@@ -31,9 +31,9 @@ export const Tutorial = () => {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>How to Play Mathler</DialogTitle>
+          <DialogTitle className="text-foreground">How to Play Mathler</DialogTitle>
         </DialogHeader>
-        <div className="prose space-y-2 text-sm">
+        <div className="prose space-y-2 text-sm text-foreground">
           <p>
             Challenge yourself to uncover the hidden calculation in just 6
             attempts!

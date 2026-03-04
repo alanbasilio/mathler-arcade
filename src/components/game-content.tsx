@@ -6,11 +6,11 @@ import { Settings } from "@/components/settings";
 import { Tutorial } from "@/components/tutorial";
 import { useAudio } from "@/hooks/use-audio";
 import { useGame } from "@/hooks/use-game";
-import { GitHubLogoIcon } from "@radix-ui/react-icons";
-import { Heart, Moon, MusicIcon, Sun, Volume2, VolumeOff } from "lucide-react";
+import { Github, Heart, Moon, MusicIcon, Sun, Volume2, VolumeOff } from "lucide-react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { useMediaQuery } from "usehooks-ts";
+import { Button } from "./ui/button";
 
 export const GameContent = () => {
   const { theme, setTheme } = useTheme();
@@ -23,7 +23,7 @@ export const GameContent = () => {
     setTheme(theme === "dark" ? "light" : "dark");
   };
 
-  const ThemeToggleIcon = theme === "dark" ? Moon : Sun;
+  const ThemeToggleIcon = theme === "dark" ? Sun : Moon;
   const AudioIcon = stopAudio ? VolumeOff : Volume2;
 
   return (
@@ -39,7 +39,7 @@ export const GameContent = () => {
             <ThemeToggleIcon className="lg:absolute lg:right-5 lg:bottom-5" />
           </Link>
           <h1
-            className="text-3xl md:text-4xl lg:text-5xl italic leading-none tracking-tighter"
+            className="text-foreground text-3xl md:text-4xl lg:text-5xl italic leading-none tracking-tighter"
             data-cy="title"
           >
             Mathler
@@ -54,7 +54,7 @@ export const GameContent = () => {
           </Link>
         </div>
         <h2
-          className="text-xs lg:text-base leading-none tracking-tighter"
+          className="text-foreground text-xs lg:text-base leading-none tracking-tighter"
           data-cy="subtitle"
         >
           {isDesktop ? (
@@ -86,32 +86,40 @@ export const GameContent = () => {
         </p>
       )}
       <div className="flex items-center gap-2">
-        <Link
-          href="https://github.com/alanbasilio/mathler-arcade"
-          target="_blank"
-          className="text-xs flex items-center gap-2"
-        >
-          <GitHubLogoIcon className="w-3 h-3" />
-          Github
-        </Link>
-        <span className="max-md:hidden">|</span>
-        <Link
-          href="https://vektroid.bandcamp.com/track/420"
-          target="_blank"
-          className="text-xs flex items-center gap-2 max-md:hidden"
-        >
-          <MusicIcon className="w-3 h-3" />
-          Music by Macintosh Plus
-        </Link>
-        |
-        <Link
-          href="https://alanbasilio.com"
-          target="_blank"
-          className="text-xs flex items-center gap-2"
-        >
-          <Heart className="w-3 h-3" />
-          Made by Alan Basilio
-        </Link>
+        <Button asChild variant="link" size="xs">
+          <Link
+            href="https://github.com/alanbasilio/mathler-arcade"
+            target="_blank"
+            className="text-foreground!"
+
+          >
+            <Github className="size-3" />
+            Github
+          </Link>
+        </Button>
+        <span className="text-foreground!">|</span>
+        <Button asChild variant="link" size="xs">
+          <Link
+            href="https://vektroid.bandcamp.com/track/420"
+            target="_blank"
+            className="text-foreground!"
+
+          >
+            <MusicIcon className="size-3" />
+            Music by Macintosh Plus
+          </Link>
+        </Button>
+        <span className="text-foreground!">|</span>
+        <Button asChild variant="link" size="xs">
+          <Link
+            href="https://alanbasilio.com"
+            target="_blank"
+            className="text-foreground!"
+          >
+            <Heart className="size-3" />
+            Made by Alan Basilio
+          </Link>
+        </Button>
       </div>
     </div>
   );

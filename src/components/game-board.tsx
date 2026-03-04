@@ -1,7 +1,7 @@
 "use client";
 
 import { useGame } from "@/hooks/use-game";
-import { cn } from "@/utils/cn";
+import { cn } from "@/lib/utils";
 import { FeedbackColor, getFeedbackColor } from "@/utils/feedback";
 
 interface GameBoardTileProps {
@@ -24,7 +24,7 @@ const GameBoardTile = ({ value, color, index }: GameBoardTileProps) => {
   return (
     <div
       className={cn(
-        "w-8 md:w-10 aspect-square flex items-center justify-center text-sm md:text-base lg:text-lg xl:text-2xl font-bold border-foreground border-4 shadow-lg",
+        "text-foreground w-8 md:w-10 aspect-square flex items-center justify-center text-sm md:text-base lg:text-lg xl:text-2xl font-bold border-foreground border-4 shadow-lg",
         mode === "normal" && {
           "bg-success": feedbackColor === "success",
           "bg-warning": feedbackColor === "warning",

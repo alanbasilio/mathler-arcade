@@ -1,4 +1,4 @@
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "@/components/ui/sonner";
 import { AudioProvider } from "@/providers/audio-provider";
 import { GameProvider } from "@/providers/game-provider";
 import "nes.css/css/nes.min.css";

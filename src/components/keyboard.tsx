@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useGame } from "@/hooks/use-game";
-import { cn } from "@/utils/cn";
+import { cn } from "@/lib/utils";
 import { getFeedbackColor } from "@/utils/feedback";
 
 const NUMBER_KEYS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];

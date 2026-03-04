@@ -2,7 +2,6 @@
 
 import { Guess } from "@/components/game-board";
 import { useAudio } from "@/hooks/use-audio";
-import { useToast } from "@/hooks/use-toast";
 import { evaluate, isCumulativeSolution } from "@/utils/evaluate";
 import { FeedbackColor, getFeedback } from "@/utils/feedback";
 import { getNumberOfTheDay } from "@/utils/numbers";
@@ -13,6 +12,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import { toast } from "sonner";
 
 type GameMode = "normal" | "hard";
 
@@ -48,7 +48,6 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
   const [keyboardFeedback, setKeyboardFeedback] = useState<
     Record<string, FeedbackColor>
   >({});
-  const { toast } = useToast();
   const { playSound } = useAudio();
   const [activeKey, setActiveKey] = useState<string>("");
 
@@ -104,10 +103,9 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
   const handleSubmitGuess = useCallback(() => {
     if (currentGuess.length < 6) {
       playSound("warning");
-      toast({
-        title: "Error",
+      toast.error('Error', {
         description: "Fill in all 6 spaces of the equation!",
-        variant: "destructive",
+        position: "top-center",
       });
       return;
     }
@@ -116,21 +114,19 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
 
     if (isDuplicateGuess()) {
       playSound("warning");
-      toast({
-        title: "Oh no!",
+      toast.warning("Oh no!", {
         description: "You've already tried this guess. Try a different one!",
-        variant: "warning",
+        position: "top-center",
       });
       return;
     }
 
     if (!containsOperator()) {
       playSound("warning");
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description:
           "The equation must contain at least one operator (+, -, *, /)!",
-        variant: "destructive",
+        position: "top-center",
       });
       return;
     }
@@ -147,20 +143,18 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
       }
       if (evaluatedGuess !== targetResult) {
         playSound("warning");
-        toast({
-          title: "Warning",
+        toast.warning("Warning", {
           description: `Every guess must result in ${targetResult}. Try again!`,
-          variant: "warning",
+          position: "top-center",
         });
         return;
       }
       processValidGuessFeedback();
     } else {
       playSound("warning");
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description: "Try a valid equation!",
-        variant: "destructive",
+        position: "top-center",
       });
     }
   }, [currentGuess, gameOver, guesses, toast, playSound]);
