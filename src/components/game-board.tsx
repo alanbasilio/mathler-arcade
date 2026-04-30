@@ -34,6 +34,7 @@ const GameBoardTile = ({ value, color, index, mode }: GameBoardTileProps) => {
           "bg-success text-success-foreground": feedbackColor === "success",
           "bg-warning text-warning-foreground": feedbackColor === "warning",
           "bg-accent": feedbackColor === "outline",
+          "bg-destructive text-white": feedbackColor === "destructive",
         }
       )}
       data-cy={`tile-${index}`}

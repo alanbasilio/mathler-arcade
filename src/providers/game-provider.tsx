@@ -123,7 +123,12 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
 
   const processValidGuessFeedback = useCallback(
     (guess: string, currentGuessCount: number) => {
-      const feedback = getFeedback(guess, targetEquation);
+      const rawFeedback = getFeedback(guess, targetEquation);
+
+      const feedback: FeedbackColor[] = rawFeedback.map((color, index) => {
+        if (!/\d/.test(guess[index])) return color;
+        return color === "outline" ? "destructive" : "success";
+      });
 
       const newGuess: Guess = {
         tiles: guess.split("").map((char, index) => ({
