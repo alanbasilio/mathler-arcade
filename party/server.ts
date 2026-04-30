@@ -1,15 +1,15 @@
 import type * as Party from "partykit/server";
-import { evaluate, isCumulativeSolution } from "../src/utils/evaluate";
-import { getFeedback } from "../src/utils/feedback";
-import { getNumberOfTheDay } from "../src/utils/numbers";
-import { EQUATION_LENGTH, MAX_GUESSES } from "../src/utils/constants";
 import type {
   ChatMessage,
   GameSession,
   MultiplayerGuess,
   SessionPlayer,
 } from "../src/types/multiplayer";
+import { EQUATION_LENGTH, MAX_GUESSES } from "../src/utils/constants";
+import { evaluate, isCumulativeSolution } from "../src/utils/evaluate";
 import type { FeedbackColor } from "../src/utils/feedback";
+import { getFeedback } from "../src/utils/feedback";
+import { getNumberOfTheDay } from "../src/utils/numbers";
 
 const createInitialSession = (): GameSession => {
   const targetEquation = getNumberOfTheDay();
@@ -34,7 +34,9 @@ export default class GameServer implements Party.Server {
   }
 
   onConnect(conn: Party.Connection) {
-    conn.send(JSON.stringify({ type: "session-updated", session: this.session }));
+    conn.send(
+      JSON.stringify({ type: "session-updated", session: this.session }),
+    );
   }
 
   onMessage(message: string, sender: Party.Connection) {
@@ -66,7 +68,9 @@ export default class GameServer implements Party.Server {
       this.broadcast({ type: "session-updated", session: this.session });
     }
 
-    this.session.players = this.session.players.filter((p) => p.id !== playerId);
+    this.session.players = this.session.players.filter(
+      (p) => p.id !== playerId,
+    );
   }
 
   private handleJoin(conn: Party.Connection, name: string, playerId: string) {
@@ -75,7 +79,9 @@ export default class GameServer implements Party.Server {
       return;
     }
     if (this.session.status === "finished") {
-      conn.send(JSON.stringify({ type: "error", message: "Session has ended" }));
+      conn.send(
+        JSON.stringify({ type: "error", message: "Session has ended" }),
+      );
       return;
     }
 
@@ -129,7 +135,9 @@ export default class GameServer implements Party.Server {
 
     const result = evaluate(guess);
     if (result === null) {
-      conn.send(JSON.stringify({ type: "error", message: "Invalid equation!" }));
+      conn.send(
+        JSON.stringify({ type: "error", message: "Invalid equation!" }),
+      );
       return;
     }
     if (result !== this.session.targetResult) {
