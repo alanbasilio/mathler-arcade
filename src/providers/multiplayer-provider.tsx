@@ -163,6 +163,16 @@ export const MultiplayerProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      // Skip if a button or form element has focus — they handle their own events.
+      // Prevents Enter from double-firing when a keyboard button is focused.
+      const active = document.activeElement;
+      if (
+        active instanceof HTMLButtonElement ||
+        active instanceof HTMLInputElement ||
+        active instanceof HTMLTextAreaElement
+      ) {
+        return;
+      }
       if (VALID_KEYS.includes(event.key)) {
         handleKeyPress(event.key);
       }

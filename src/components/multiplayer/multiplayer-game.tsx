@@ -78,8 +78,11 @@ const PlayerBar = () => {
 };
 
 const MultiplayerBoard = () => {
-  const { session, currentGuess, myPlayer } = useMultiplayer();
+  const { session, currentGuess, myPlayer, isMyTurn } = useMultiplayer();
   const guesses = session?.guesses ?? [];
+  const currentPlayer = session?.players.find(
+    (p) => p.id === session?.currentTurn,
+  );
 
   return (
     <div
@@ -90,27 +93,39 @@ const MultiplayerBoard = () => {
         const guess: MultiplayerGuess | undefined = guesses[rowIndex];
         const isCurrentRow = rowIndex === guesses.length;
         const isFilled = Boolean(guess);
+        const isMe = isFilled && guess.playerName === myPlayer?.name;
 
         return (
           <div
             key={rowIndex}
             className={cn(
-              "relative flex gap-2",
+              "relative flex gap-2 items-center",
               !isFilled && !isCurrentRow && "opacity-50",
             )}
           >
+            {/* Desktop: name badge to the left of the grid */}
             {isFilled && (
               <span
                 className={cn(
                   "hidden md:block absolute right-full top-1/2 -translate-y-1/2 pr-2 text-[9px] font-bold whitespace-nowrap max-w-[96px] truncate text-right",
-                  guess.playerName === myPlayer?.name
-                    ? "text-success"
-                    : "text-warning",
+                  isMe ? "text-success" : "text-warning",
                 )}
               >
                 {guess.playerName}
               </span>
             )}
+            {isCurrentRow && session?.status === "playing" && (
+              <span
+                className={cn(
+                  "hidden md:block absolute right-full top-1/2 -translate-y-1/2 pr-2 text-[9px] font-bold whitespace-nowrap animate-pulse",
+                  isMyTurn ? "text-success" : "text-warning",
+                )}
+              >
+                {isMyTurn ? "▶ YOU" : `▶ ${currentPlayer?.name ?? ""}`}
+              </span>
+            )}
+
+            {/* Tiles */}
             {Array.from({ length: COLUMNS }, (_, colIndex) => {
               const value = isFilled
                 ? guess.tiles[colIndex].value
@@ -127,6 +142,28 @@ const MultiplayerBoard = () => {
                 />
               );
             })}
+
+            {/* Mobile: inline name indicator to the right of the tiles */}
+            {isFilled && (
+              <span
+                className={cn(
+                  "md:hidden ml-0.5 text-[8px] font-bold whitespace-nowrap max-w-[40px] truncate",
+                  isMe ? "text-success" : "text-warning",
+                )}
+              >
+                {guess.playerName}
+              </span>
+            )}
+            {isCurrentRow && session?.status === "playing" && (
+              <span
+                className={cn(
+                  "md:hidden ml-0.5 text-[8px] font-bold whitespace-nowrap animate-pulse",
+                  isMyTurn ? "text-success" : "text-warning",
+                )}
+              >
+                {isMyTurn ? "YOU" : (currentPlayer?.name ?? "")}
+              </span>
+            )}
           </div>
         );
       })}
@@ -143,6 +180,9 @@ const MultiplayerKeyboard = () => {
     <Button
       key={key}
       onClick={() => handleKeyPress(key)}
+      // Prevent the button from receiving focus on mouse click so that
+      // subsequent Enter key presses don't re-trigger the button click.
+      onMouseDown={(e) => e.preventDefault()}
       variant={getFeedbackColor(keyboardFeedback[key])}
       disabled={!isMyTurn}
       className={cn("min-h-10 min-w-10 transition-opacity", {
