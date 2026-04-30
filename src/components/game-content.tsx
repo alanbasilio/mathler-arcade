@@ -1,7 +1,12 @@
 "use client";
 
+import { GameBoard } from "@/components/game-board";
+import { Keyboard } from "@/components/keyboard";
+import { Settings } from "@/components/settings";
+import { Tutorial } from "@/components/tutorial";
+import { useAudio } from "@/hooks/use-audio";
+import { useGame } from "@/hooks/use-game";
 import {
-  Github,
   Heart,
   Moon,
   MusicIcon,
@@ -9,15 +14,10 @@ import {
   Volume2,
   VolumeOff,
 } from "lucide-react";
-import Link from "next/link";
 import { useTheme } from "next-themes";
+import Image from "next/image";
+import Link from "next/link";
 import { useMediaQuery } from "usehooks-ts";
-import { GameBoard } from "@/components/game-board";
-import { Keyboard } from "@/components/keyboard";
-import { Settings } from "@/components/settings";
-import { Tutorial } from "@/components/tutorial";
-import { useAudio } from "@/hooks/use-audio";
-import { useGame } from "@/hooks/use-game";
 import { Button } from "./ui/button";
 
 export const GameContent = () => {
@@ -100,7 +100,7 @@ export const GameContent = () => {
             target="_blank"
             className="text-foreground!"
           >
-            <Github className="size-3" />
+            <Image className="dark:invert" src="/images/github.svg" alt="Github" width={12} height={12} />
             Github
           </Link>
         </Button>
