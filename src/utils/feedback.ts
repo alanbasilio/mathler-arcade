@@ -1,4 +1,4 @@
-export type FeedbackColor = "outline" | "warning" | "success" | "default";
+export type FeedbackColor = "outline" | "warning" | "success" | "default" | "destructive";
 
 export const getFeedbackColor = (color?: FeedbackColor): FeedbackColor => {
   return color ?? "default";
@@ -15,12 +15,20 @@ export const computeKeyboardFeedback = (
     const charFeedback = feedback[index];
     const existing = updated[char];
 
-    if (charFeedback === "success") {
-      updated[char] = "success";
-    } else if (charFeedback === "warning" && existing !== "success") {
-      updated[char] = "warning";
-    } else if (charFeedback === "outline" && !existing) {
-      updated[char] = "outline";
+    if (/\d/.test(char)) {
+      if (charFeedback === "success" || charFeedback === "warning") {
+        updated[char] = "success";
+      } else if (charFeedback === "outline" && existing !== "success") {
+        updated[char] = "destructive";
+      }
+    } else {
+      if (charFeedback === "success") {
+        updated[char] = "success";
+      } else if (charFeedback === "warning" && existing !== "success") {
+        updated[char] = "warning";
+      } else if (charFeedback === "outline" && !existing) {
+        updated[char] = "outline";
+      }
     }
   });
 
