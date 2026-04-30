@@ -1,0 +1,14 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "12:00"
+      timezone: "America/Sao_Paulo"
+    target-branch: "develop"
+    groups:
+      all-dependencies:
+        patterns:
+          - "*"
