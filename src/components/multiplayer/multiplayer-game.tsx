@@ -7,12 +7,11 @@ import { cn } from "@/lib/utils";
 import type { MultiplayerGuess } from "@/types/multiplayer";
 import { EQUATION_LENGTH, MAX_GUESSES } from "@/utils/constants";
 import { getFeedbackColor } from "@/utils/feedback";
-import { Chat } from "./chat";
+import { ChatBottomBar, ChatSidebar } from "./chat";
 import { CursorOverlay } from "./cursor-overlay";
 
 const ROWS = MAX_GUESSES;
 const COLUMNS = EQUATION_LENGTH;
-
 const NUMBER_KEYS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
 const OPERATOR_KEYS = ["Backspace", "+", "-", "*", "/", "Enter"];
 
@@ -31,7 +30,7 @@ const MultiplayerTile = ({
   return (
     <div
       className={cn(
-        "text-foreground w-10 md:w-12 aspect-square flex items-center justify-center text-base md:text-lg lg:text-xl xl:text-2xl font-bold border-foreground border-4 shadow-lg transition-colors duration-300",
+        "text-foreground w-10 md:w-12 aspect-square flex items-center justify-center text-base md:text-lg font-bold border-foreground border-4 shadow-lg transition-colors duration-300",
         {
           "bg-success text-success-foreground": feedbackColor === "success",
           "bg-warning text-warning-foreground": feedbackColor === "warning",
@@ -42,6 +41,38 @@ const MultiplayerTile = ({
       data-cy={`tile-${index}`}
     >
       {value}
+    </div>
+  );
+};
+
+const PlayerBar = () => {
+  const { session, myPlayer, isMyTurn } = useMultiplayer();
+  if (!session || session.players.length < 2) return null;
+
+  const me = session.players.find((p) => p.id === myPlayer?.id);
+  const opponent = session.players.find((p) => p.id !== myPlayer?.id);
+
+  return (
+    <div className="flex items-center gap-3 text-[10px] font-bold tracking-wide">
+      <span
+        className={cn(
+          "text-success transition-opacity",
+          !isMyTurn && "opacity-40",
+        )}
+      >
+        {isMyTurn && "▶ "}
+        {me?.name}
+      </span>
+      <span className="text-foreground/30 text-[8px]">VS</span>
+      <span
+        className={cn(
+          "text-warning transition-opacity",
+          isMyTurn && "opacity-40",
+        )}
+      >
+        {opponent?.name}
+        {!isMyTurn && " ◀"}
+      </span>
     </div>
   );
 };
@@ -64,14 +95,14 @@ const MultiplayerBoard = () => {
           <div
             key={rowIndex}
             className={cn(
-              "flex gap-2 items-center",
+              "relative flex gap-2",
               !isFilled && !isCurrentRow && "opacity-50",
             )}
           >
             {isFilled && (
               <span
                 className={cn(
-                  "text-xs font-bold w-16 text-right pr-1 truncate",
+                  "hidden md:block absolute right-full top-1/2 -translate-y-1/2 pr-2 text-[9px] font-bold whitespace-nowrap max-w-[96px] truncate text-right",
                   guess.playerName === myPlayer?.name
                     ? "text-success"
                     : "text-warning",
@@ -80,7 +111,6 @@ const MultiplayerBoard = () => {
                 {guess.playerName}
               </span>
             )}
-            {!isFilled && <span className="w-16" />}
             {Array.from({ length: COLUMNS }, (_, colIndex) => {
               const value = isFilled
                 ? guess.tiles[colIndex].value
@@ -115,22 +145,22 @@ const MultiplayerKeyboard = () => {
       onClick={() => handleKeyPress(key)}
       variant={getFeedbackColor(keyboardFeedback[key])}
       disabled={!isMyTurn}
-      className={cn("min-h-10 min-w-10", {
+      className={cn("min-h-10 min-w-10 transition-opacity", {
         "animate-pulse": highlightEnter && key === "Enter",
-        "opacity-40 cursor-not-allowed": !isMyTurn && key !== "Enter",
+        "opacity-30": !isMyTurn,
       })}
       data-cy={`key-${key}`}
     >
-      {key === "Backspace" ? "Delete" : key}
+      {key === "Backspace" ? "Del" : key}
     </Button>
   );
 
   return (
     <div className="flex flex-col gap-2 items-center">
-      <div className="flex gap-2 flex-wrap justify-center">
+      <div className="flex gap-1.5 flex-wrap justify-center">
         {NUMBER_KEYS.map(renderKey)}
       </div>
-      <div className="flex gap-2 flex-wrap justify-center">
+      <div className="flex gap-1.5 flex-wrap justify-center">
         {OPERATOR_KEYS.map(renderKey)}
       </div>
     </div>
@@ -147,7 +177,7 @@ const GameOverBanner = () => {
   return (
     <div
       className={cn(
-        "mt-2 px-4 py-3 border-4 font-bold text-center text-xs md:text-sm animate-pop",
+        "w-full px-4 py-3 border-4 font-bold text-center text-xs md:text-sm",
         won
           ? "border-success bg-success/10 text-success"
           : "border-destructive bg-destructive/10 text-destructive",
@@ -167,20 +197,20 @@ const GameOverBanner = () => {
 };
 
 export const MultiplayerGame = () => {
-  const { session, isMyTurn } = useMultiplayer();
+  const { session } = useMultiplayer();
   const isDesktop = useMediaQuery("(min-width: 768px)");
-
   const targetResult = session?.targetResult ?? 0;
 
   return (
-    <div className="flex flex-col gap-6 p-4 z-10 items-center pb-24 md:pb-4">
+    <div className="flex flex-col gap-4 p-4 z-10 items-center pb-20 md:pb-4">
       <div className="text-center space-y-2">
         <h1 className="text-foreground text-3xl md:text-4xl lg:text-5xl italic leading-none tracking-tighter">
           Mathler Duo
         </h1>
         {session?.status === "playing" && (
-          <div className="flex flex-col gap-1 items-center">
-            <h2 className="text-foreground text-xs lg:text-base leading-none tracking-tighter">
+          <div className="flex flex-col gap-2 items-center">
+            <PlayerBar />
+            <h2 className="text-foreground text-xs lg:text-sm leading-none tracking-tighter">
               {isDesktop ? (
                 <>
                   Solve the hidden equation{" "}
@@ -190,23 +220,13 @@ export const MultiplayerGame = () => {
                 </>
               ) : (
                 <>
-                  Find the calculation{" "}
+                  Find the equation{" "}
                   <span className="bg-foreground text-background p-1">
-                    that equals {targetResult}
+                    = {targetResult}
                   </span>
                 </>
               )}
             </h2>
-            <p
-              className={cn(
-                "text-xs font-bold",
-                isMyTurn ? "text-success" : "text-warning",
-              )}
-            >
-              {isMyTurn
-                ? "Your turn"
-                : `${session.players.find((p) => p.id === session.currentTurn)?.name ?? "Opponent"}'s turn`}
-            </p>
           </div>
         )}
         {session?.status === "waiting" && (
@@ -219,15 +239,18 @@ export const MultiplayerGame = () => {
       </div>
 
       {session?.status !== "waiting" && (
-        <>
-          <MultiplayerBoard />
-          <MultiplayerKeyboard />
-          <GameOverBanner />
-        </>
+        <div className="flex gap-6 items-start">
+          <div className="flex flex-col gap-3 items-center">
+            <MultiplayerBoard />
+            <MultiplayerKeyboard />
+            <GameOverBanner />
+          </div>
+          <ChatSidebar />
+        </div>
       )}
 
       <CursorOverlay />
-      <Chat />
+      <ChatBottomBar />
     </div>
   );
 };
