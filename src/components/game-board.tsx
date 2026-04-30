@@ -1,26 +1,30 @@
 "use client";
 
+import { GameMode } from "@/providers/game-provider";
 import { useGame } from "@/hooks/use-game";
 import { cn } from "@/lib/utils";
 import { EQUATION_LENGTH } from "@/utils/constants";
 import { FeedbackColor, getFeedbackColor } from "@/utils/feedback";
 
-interface GameBoardTileProps {
+interface Tile {
   value: string;
   color: FeedbackColor;
   index: number;
 }
 
+interface GameBoardTileProps extends Tile {
+  mode: GameMode;
+}
+
 export interface Guess {
-  tiles: GameBoardTileProps[];
+  tiles: Tile[];
 }
 
 const ROWS = EQUATION_LENGTH;
 const COLUMNS = EQUATION_LENGTH;
 
-const GameBoardTile = ({ value, color, index }: GameBoardTileProps) => {
+const GameBoardTile = ({ value, color, index, mode }: GameBoardTileProps) => {
   const feedbackColor = getFeedbackColor(color);
-  const { mode } = useGame();
 
   return (
     <div
@@ -29,7 +33,7 @@ const GameBoardTile = ({ value, color, index }: GameBoardTileProps) => {
         mode === "normal" && {
           "bg-success text-success-foreground": feedbackColor === "success",
           "bg-warning text-warning-foreground": feedbackColor === "warning",
-          "bg-accent": feedbackColor === "accent",
+          "bg-accent": feedbackColor === "outline",
         }
       )}
       data-cy={`tile-${index}`}
@@ -40,24 +44,19 @@ const GameBoardTile = ({ value, color, index }: GameBoardTileProps) => {
 };
 
 const GameBoardRow = ({ rowIndex }: { rowIndex: number }) => {
-  const { guesses, currentGuess } = useGame();
+  const { guesses, currentGuess, mode } = useGame();
 
   const isCurrentRow = rowIndex === guesses.length;
   const isFilled = Boolean(guesses[rowIndex]);
 
   const tileValue = (rowIndex: number, columnIndex: number) => {
-    if (isFilled) {
-      return guesses[rowIndex].tiles[columnIndex].value;
-    }
-    if (isCurrentRow) {
-      return currentGuess[columnIndex] || "";
-    }
+    if (isFilled) return guesses[rowIndex].tiles[columnIndex].value;
+    if (isCurrentRow) return currentGuess[columnIndex] || "";
     return "";
   };
 
-  const tileColor = (rowIndex: number, columnIndex: number) => {
-    return isFilled ? guesses[rowIndex].tiles[columnIndex].color : "default";
-  };
+  const tileColor = (rowIndex: number, columnIndex: number): FeedbackColor =>
+    isFilled ? guesses[rowIndex].tiles[columnIndex].color : "default";
 
   return (
     <div
@@ -71,6 +70,7 @@ const GameBoardRow = ({ rowIndex }: { rowIndex: number }) => {
           value={tileValue(rowIndex, columnIndex)}
           color={tileColor(rowIndex, columnIndex)}
           index={columnIndex}
+          mode={mode}
         />
       ))}
     </div>

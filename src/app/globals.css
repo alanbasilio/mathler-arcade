@@ -160,7 +160,5 @@
     @apply bg-background text-foreground;
   }
 
-  .nes-btn.is-success {
-    @apply text-foreground dark:text-background hover:text-foreground;
-  }
+
 }

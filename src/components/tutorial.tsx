@@ -17,14 +17,14 @@ export const Tutorial = () => {
   const { playSound } = useAudio();
   const [open, setOpen] = useState<boolean>(false);
 
-  const handleOpenChange = () => {
+  const handleOpenChange = (value: boolean) => {
     playSound("click");
-    setOpen(!open);
+    setOpen(value);
   };
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger onClick={handleOpenChange} asChild>
+      <DialogTrigger asChild>
         <Link href="#" className="hover:text-foreground">
           <Info className="lg:absolute lg:left-5 lg:top-5" />
         </Link>
@@ -44,11 +44,11 @@ export const Tutorial = () => {
           </p>
           <p className="flex gap-2">
             <Button variant="success">5</Button>
-            <Button variant="accent">0</Button>
+            <Button variant="outline">0</Button>
             <Button variant="success">/</Button>
             <Button variant="warning">5</Button>
-            <Button variant="accent">-</Button>
-            <Button variant="accent">2</Button>
+            <Button variant="outline">-</Button>
+            <Button variant="outline">2</Button>
           </p>
           <ul className="list-disc pl-4">
             <li>Green: Perfectly placed.</li>

@@ -9,7 +9,11 @@ import {
   VALID_KEYS,
 } from "@/utils/constants";
 import { evaluate, isCumulativeSolution } from "@/utils/evaluate";
-import { FeedbackColor, getFeedback } from "@/utils/feedback";
+import {
+  computeKeyboardFeedback,
+  FeedbackColor,
+  getFeedback,
+} from "@/utils/feedback";
 import { getNumberOfTheDay } from "@/utils/numbers";
 import {
   isDuplicateGuess,
@@ -25,7 +29,7 @@ import {
 } from "react";
 import { toast } from "sonner";
 
-type GameMode = "normal" | "hard";
+export type GameMode = "normal" | "hard";
 
 interface GameContextProps {
   mode: GameMode;
@@ -50,27 +54,47 @@ export const GameContext = createContext<GameContextProps | undefined>(
 const targetEquation = getNumberOfTheDay();
 const targetResult = evaluate(targetEquation) ?? 0;
 
-const computeKeyboardFeedback = (
-  current: Record<string, FeedbackColor>,
-  guess: string,
-  feedback: FeedbackColor[]
-): Record<string, FeedbackColor> => {
-  const updated = { ...current };
+type ValidationResult =
+  | { valid: true }
+  | { valid: false; kind: "error" | "warning"; title: string; description: string };
 
-  guess.split("").forEach((char, index) => {
-    const charFeedback = feedback[index];
-    const existing = updated[char];
-
-    if (charFeedback === "success") {
-      updated[char] = "success";
-    } else if (charFeedback === "warning" && existing !== "success") {
-      updated[char] = "warning";
-    } else if (charFeedback === "accent" && !existing) {
-      updated[char] = "accent";
-    }
-  });
-
-  return updated;
+const validateGuess = (
+  currentGuess: string,
+  guesses: Guess[],
+  target: number
+): ValidationResult => {
+  if (!validateGuessLength(currentGuess))
+    return {
+      valid: false,
+      kind: "error",
+      title: "Error",
+      description: `Fill in all ${EQUATION_LENGTH} spaces of the equation!`,
+    };
+  if (isDuplicateGuess(currentGuess, guesses))
+    return {
+      valid: false,
+      kind: "warning",
+      title: "Oh no!",
+      description: "You've already tried this guess. Try a different one!",
+    };
+  if (!validateHasOperator(currentGuess))
+    return {
+      valid: false,
+      kind: "error",
+      title: "Error",
+      description: "The equation must contain at least one operator (+, -, *, /)!",
+    };
+  const result = evaluate(currentGuess);
+  if (result === null)
+    return { valid: false, kind: "error", title: "Error", description: "Try a valid equation!" };
+  if (result !== target)
+    return {
+      valid: false,
+      kind: "warning",
+      title: "Warning",
+      description: `Every guess must result in ${target}. Try again!`,
+    };
+  return { valid: true };
 };
 
 export const GameProvider = ({ children }: { children: ReactNode }) => {
@@ -123,51 +147,13 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
   );
 
   const handleSubmitGuess = useCallback(() => {
-    if (!validateGuessLength(currentGuess)) {
-      playSound("warning");
-      toast.error("Error", {
-        description: `Fill in all ${EQUATION_LENGTH} spaces of the equation!`,
-        position: "top-center",
-      });
-      return;
-    }
-
     if (guesses.length >= MAX_GUESSES || gameOver) return;
 
-    if (isDuplicateGuess(currentGuess, guesses)) {
+    const validation = validateGuess(currentGuess, guesses, targetResult);
+    if (!validation.valid) {
       playSound("warning");
-      toast.warning("Oh no!", {
-        description: "You've already tried this guess. Try a different one!",
-        position: "top-center",
-      });
-      return;
-    }
-
-    if (!validateHasOperator(currentGuess)) {
-      playSound("warning");
-      toast.error("Error", {
-        description:
-          "The equation must contain at least one operator (+, -, *, /)!",
-        position: "top-center",
-      });
-      return;
-    }
-
-    const evaluatedGuess = evaluate(currentGuess);
-
-    if (evaluatedGuess === null) {
-      playSound("warning");
-      toast.error("Error", {
-        description: "Try a valid equation!",
-        position: "top-center",
-      });
-      return;
-    }
-
-    if (evaluatedGuess !== targetResult) {
-      playSound("warning");
-      toast.warning("Warning", {
-        description: `Every guess must result in ${targetResult}. Try again!`,
+      toast[validation.kind](validation.title, {
+        description: validation.description,
         position: "top-center",
       });
       return;

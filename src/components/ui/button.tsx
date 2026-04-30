@@ -10,8 +10,8 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        // destructive:
-        //   "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:bg-destructive/60 dark:focus-visible:ring-destructive/40",
+        destructive:
+          "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:bg-destructive/60 dark:focus-visible:ring-destructive/40",
         outline:
           "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
         secondary:
@@ -19,11 +19,10 @@ const buttonVariants = cva(
         ghost:
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         link: "text-foreground underline-offset-4 hover:underline",
-        destructive: "is-error",
-        warning: "is-warning",
-        success: "is-success",
-        accent: "bg-accent",
-        primary: "is-primary",
+        warning: "bg-warning text-warning-foreground hover:bg-warning/90",
+        success: "bg-success text-success-foreground hover:bg-success/90",
+        pixel:
+          "bg-primary text-primary-foreground rounded-none border-4 border-foreground shadow-[4px_4px_0px_var(--color-foreground)] active:shadow-none active:translate-x-1 active:translate-y-1",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

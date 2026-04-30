@@ -1,11 +1,34 @@
-export type FeedbackColor = "accent" | "warning" | "success" | "default";
+export type FeedbackColor = "outline" | "warning" | "success" | "default";
 
 export const getFeedbackColor = (color?: FeedbackColor): FeedbackColor => {
   return color ?? "default";
 };
 
+export const computeKeyboardFeedback = (
+  current: Record<string, FeedbackColor>,
+  guess: string,
+  feedback: FeedbackColor[]
+): Record<string, FeedbackColor> => {
+  const updated = { ...current };
+
+  guess.split("").forEach((char, index) => {
+    const charFeedback = feedback[index];
+    const existing = updated[char];
+
+    if (charFeedback === "success") {
+      updated[char] = "success";
+    } else if (charFeedback === "warning" && existing !== "success") {
+      updated[char] = "warning";
+    } else if (charFeedback === "outline" && !existing) {
+      updated[char] = "outline";
+    }
+  });
+
+  return updated;
+};
+
 export const getFeedback = (guess: string, target: string): FeedbackColor[] => {
-  const feedback: FeedbackColor[] = Array(6).fill("accent");
+  const feedback: FeedbackColor[] = Array(6).fill("outline");
   const targetChars = target.split("");
   const guessChars = guess.split("");
 

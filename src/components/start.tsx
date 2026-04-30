@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useGame } from "@/hooks/use-game";
 
 export const Start = () => {
@@ -18,13 +19,15 @@ export const Start = () => {
       >
         Ready to crunch some numbers?
       </p>
-      <button
+      <Button
         onClick={startGame}
-        className="nes-btn is-primary text-base md:text-lg lg:text-xl animate-pulse mt-2"
+        variant="pixel"
+        size="lg"
+        className="text-base md:text-lg lg:text-xl animate-pulse mt-2"
         data-cy="start"
       >
         PRESS TO START
-      </button>
+      </Button>
     </div>
   );
 };

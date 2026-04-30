@@ -1,7 +1,6 @@
 import { Toaster } from "@/components/ui/sonner";
 import { AudioProvider } from "@/providers/audio-provider";
 import { GameProvider } from "@/providers/game-provider";
-import "nes.css/css/nes.min.css";
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import { Press_Start_2P } from "next/font/google";

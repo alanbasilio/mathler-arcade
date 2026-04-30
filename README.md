@@ -1,18 +1,14 @@
 # Mathler Arcade
 
-An Arcade-inspired math game.
+Daily math puzzle game in the style of Wordle. Players guess a hidden 6-character equation that evaluates to the day's target number.
 
 ## Stack
 
-- **TypeScript**
-- **React**
-- **Next.js**
-- **Node.js**
-- **Tailwind CSS**
-- **shadcn/ui** for pre-built React components
-- **Radix UI** for accessible and customizable UI primitives
-- **NES.css** for retro-style UI components
+- **TypeScript** + **React 19** + **Next.js 16** (App Router)
+- **Tailwind CSS 4** + **shadcn/ui** + **Radix UI**
 - **use-sound** for audio effects
+- **Framer Motion** + **tw-animate-css** for animations
+- **Biome** for linting and formatting
 - **Cypress** for end-to-end testing
 
 ## Getting Started
@@ -28,49 +24,58 @@ An Arcade-inspired math game.
 
    ```bash
    npm install
-   # or
-   yarn install
    ```
 
 3. Run the development server:
 
    ```bash
    npm run dev
-   # or
-   yarn dev
    ```
 
-4. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. Open [http://localhost:3000](http://localhost:3000) with your browser.
 
-### Scripts
+## Scripts
 
-- `dev`: Runs the development server.
-- `build`: Builds the application for production.
-- `start`: Starts the production server.
-- `lint`: Runs ESLint to check for linting errors.
-- `cypress:open`: Opens the Cypress test runner.
-- `cypress:run`: Runs Cypress tests in headless mode.
+| Command | Description |
+|---|---|
+| `npm run dev` | Start development server |
+| `npm run build` | Production build |
+| `npm run start` | Start production server |
+| `npm run lint` | Biome check |
+| `npm run format` | Biome format --write |
+| `npm run cypress:open` | Open Cypress test runner |
+| `npm run cypress:run` | Run Cypress tests headless |
 
-## Curiosities
+## Game Rules
 
-- **Numbers and operators can appear multiple times.**
-- **Order of operation applies:** Multiplication and division are calculated before addition and subtraction.
-- **Color feedback:** After each guess, the color of the tiles changes to reflect the status:
-  - Green: Correct and in the right spot.
-  - Yellow: Correct but in the wrong spot.
-  - Grey: Not part of the equation.
-- **Cumulative solutions:** The game accepts cumulative solutions (e.g., 1+5*15 === 15*5+1).
+- Each guess must be exactly 6 characters
+- Must include at least one operator (`+`, `-`, `*`, `/`)
+- The equation must evaluate to the day's target number
+- Standard operator precedence applies (`*` and `/` before `+` and `-`)
+- Numbers and operators can appear more than once
+- Commutative solutions (e.g. `1+5*15` and `15*5+1`) are both accepted and auto-aligned
+
+## Override Daily Puzzle
+
+Add `?date=DDMMYYYY` to the URL to load a specific day's puzzle.
+
+## Project Structure
+
+```
+src/
+├── app/          # Next.js entry points (layout, page, globals.css)
+├── components/   # UI components (game board, keyboard, dialogs)
+├── hooks/        # Context consumer hooks (useGame, useAudio)
+├── providers/    # Game and audio state (React Context)
+├── utils/        # Pure business logic (validate, evaluate, feedback, numbers)
+└── lib/          # Shared utilities (cn)
+```
+
+Each directory has a `README.md` with detailed documentation.
 
 ## Acknowledgements
 
-I would like to express my gratitude to the following individuals and projects that have contributed to making this game possible:
-
-- **Josh Comeau** ([@joshwcomeau](https://github.com/joshwcomeau)) - Creator of the [use-sound](https://github.com/joshwcomeau/use-sound) library, which greatly enhanced the audio experience in this game.
-- **Rauno Freiberg** ([@raunofreiberg](https://github.com/raunofreiberg)) - Creator of the [UI Playbook](https://github.com/raunofreiberg/interfaces), which provided inspiring guidelines and best practices for creating intuitive user interfaces.
-- [**shadcn/ui**](https://github.com/shadcn/ui) - For providing a fantastic collection of accessible and customizable React components that greatly enhanced the user interface of this game.
-- The [**NES.css**](https://github.com/nostalgic-css/NES.css) team - For their nostalgic NES-style CSS Framework that added a delightful retro aesthetic to the game's design.
-- **Macintosh Plus** aka [Ramona Andra Langley](https://en.wikipedia.org/wiki/Ramona_Andra_Langley) - For the iconic vaporwave track "リサフランク 420 / 現代のコンピュー" (Lisa Frank 420 / Modern Computing) that served as the thematic inspiration for this project's aesthetic and atmosphere. Your groundbreaking work in the vaporwave genre has left an indelible mark on internet culture and music.
-
-- All the open-source contributors whose libraries and tools were used in this project.
-
-Your work and contributions to the developer community are greatly appreciated!
+- **Josh Comeau** ([@joshwcomeau](https://github.com/joshwcomeau)) — Creator of [use-sound](https://github.com/joshwcomeau/use-sound)
+- **Rauno Freiberg** ([@raunofreiberg](https://github.com/raunofreiberg)) — Creator of [UI Playbook](https://github.com/raunofreiberg/interfaces)
+- [**shadcn/ui**](https://github.com/shadcn/ui) — Accessible and customizable React components
+- **Macintosh Plus** aka [Ramona Andra Langley](https://en.wikipedia.org/wiki/Ramona_Andra_Langley) — Thematic audio inspiration

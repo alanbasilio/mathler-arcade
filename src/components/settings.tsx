@@ -27,14 +27,14 @@ export const Settings = () => {
     playSound("click");
   };
 
-  const handleOpenChange = () => {
+  const handleOpenChange = (value: boolean) => {
     playSound("click");
-    setOpen(!open);
+    setOpen(value);
   };
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild onClick={handleOpenChange}>
+      <DialogTrigger asChild>
         <Link href="#" className="hover:text-foreground">
           <SettingsIcon
             data-cy="settings-icon"
@@ -53,7 +53,7 @@ export const Settings = () => {
               <label>
                 <input
                   type="radio"
-                  className="nes-radio"
+                  className="size-4 accent-foreground cursor-pointer"
                   name="difficulty"
                   checked={mode === "normal"}
                   onChange={() => handleModeChange("normal")}
@@ -64,7 +64,7 @@ export const Settings = () => {
               <label>
                 <input
                   type="radio"
-                  className="nes-radio"
+                  className="size-4 accent-foreground cursor-pointer"
                   name="difficulty"
                   checked={mode === "hard"}
                   onChange={() => handleModeChange("hard")}
@@ -74,7 +74,7 @@ export const Settings = () => {
               </label>
             </div>
           </fieldset>
-          <Button onClick={handleOpenChange} data-cy="close-settings">
+          <Button onClick={() => handleOpenChange(false)} data-cy="close-settings">
             Ok
           </Button>
         </div>
