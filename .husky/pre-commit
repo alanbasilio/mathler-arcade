@@ -1,1 +1,3 @@
-npx biome check --write --staged
+if git diff --cached --name-only | grep -qE '\.(js|jsx|ts|tsx|json|css)$'; then
+  npx biome check --write --staged
+fi
