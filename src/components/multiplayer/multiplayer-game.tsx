@@ -78,7 +78,8 @@ const PlayerBar = () => {
 };
 
 const MultiplayerBoard = () => {
-  const { session, currentGuess, myPlayer, isMyTurn } = useMultiplayer();
+  const { session, currentGuess, opponentCurrentGuess, myPlayer, isMyTurn } =
+    useMultiplayer();
   const guesses = session?.guesses ?? [];
   const currentPlayer = session?.players.find(
     (p) => p.id === session?.currentTurn,
@@ -137,10 +138,13 @@ const MultiplayerBoard = () => {
 
             {/* Tiles */}
             {Array.from({ length: COLUMNS }, (_, colIndex) => {
+              const activeGuess = isMyTurn
+                ? currentGuess
+                : opponentCurrentGuess;
               const value = isFilled
                 ? guess.tiles[colIndex].value
                 : isCurrentRow
-                  ? (currentGuess[colIndex] ?? "")
+                  ? (activeGuess[colIndex] ?? "")
                   : "";
               const color = isFilled ? guess.tiles[colIndex].color : "default";
               return (

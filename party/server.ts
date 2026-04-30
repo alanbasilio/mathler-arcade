@@ -48,6 +48,9 @@ export default class GameServer implements Party.Server {
       case "submit-guess":
         this.handleSubmitGuess(sender, msg.guess);
         break;
+      case "typing":
+        this.handleTyping(sender, msg.guess);
+        break;
       case "cursor-move":
         this.handleCursorMove(sender, msg.x, msg.y);
         break;
@@ -194,6 +197,14 @@ export default class GameServer implements Party.Server {
     }
 
     this.broadcast({ type: "session-updated", session: this.session });
+  }
+
+  private handleTyping(conn: Party.Connection, guess: string) {
+    for (const connection of this.room.getConnections()) {
+      if (connection.id !== conn.id) {
+        connection.send(JSON.stringify({ type: "opponent-typing", guess }));
+      }
+    }
   }
 
   private handleCursorMove(conn: Party.Connection, x: number, y: number) {

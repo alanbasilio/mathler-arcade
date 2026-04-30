@@ -26,6 +26,7 @@ interface MultiplayerContextProps {
   isMyTurn: boolean;
   opponentCursor: { x: number; y: number; name: string } | null;
   currentGuess: string;
+  opponentCurrentGuess: string;
   keyboardFeedback: Record<string, FeedbackColor>;
   createSession: (name: string) => string;
   joinSession: (sessionId: string, name: string) => void;
@@ -46,6 +47,7 @@ export const MultiplayerProvider = ({ children }: { children: ReactNode }) => {
     name: string;
   } | null>(null);
   const [currentGuess, setCurrentGuess] = useState("");
+  const [opponentCurrentGuess, setOpponentCurrentGuess] = useState("");
   const [keyboardFeedback, setKeyboardFeedback] = useState<
     Record<string, FeedbackColor>
   >({});
@@ -87,6 +89,8 @@ export const MultiplayerProvider = ({ children }: { children: ReactNode }) => {
       switch (msg.type) {
         case "session-updated": {
           setSession(msg.session);
+          // Clear opponent's in-progress guess whenever a turn completes
+          setOpponentCurrentGuess("");
           let feedback: Record<string, FeedbackColor> = {};
           for (const guess of msg.session.guesses) {
             const guessStr = guess.tiles.map((t) => t.value).join("");
@@ -98,6 +102,9 @@ export const MultiplayerProvider = ({ children }: { children: ReactNode }) => {
         }
         case "opponent-cursor":
           setOpponentCursor({ x: msg.x, y: msg.y, name: msg.name });
+          break;
+        case "opponent-typing":
+          setOpponentCurrentGuess(msg.guess);
           break;
         case "new-message":
           setSession((prev) =>
@@ -145,10 +152,15 @@ export const MultiplayerProvider = ({ children }: { children: ReactNode }) => {
       if (key === "Enter") {
         send({ type: "submit-guess", guess: currentGuess });
         setCurrentGuess("");
+        send({ type: "typing", guess: "" });
       } else if (key === "Backspace") {
-        setCurrentGuess((prev) => prev.slice(0, -1));
+        const next = currentGuess.slice(0, -1);
+        setCurrentGuess(next);
+        send({ type: "typing", guess: next });
       } else if (currentGuess.length < EQUATION_LENGTH) {
-        setCurrentGuess((prev) => prev + key);
+        const next = currentGuess + key;
+        setCurrentGuess(next);
+        send({ type: "typing", guess: next });
       }
     },
     [currentGuess, isMyTurn, send, session?.status],
@@ -211,6 +223,7 @@ export const MultiplayerProvider = ({ children }: { children: ReactNode }) => {
         isMyTurn,
         opponentCursor,
         currentGuess,
+        opponentCurrentGuess,
         keyboardFeedback,
         createSession,
         joinSession,

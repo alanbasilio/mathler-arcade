@@ -36,11 +36,13 @@ export interface GameSession {
 export type ClientMessage =
   | { type: "join"; name: string; playerId: string }
   | { type: "submit-guess"; guess: string }
+  | { type: "typing"; guess: string }
   | { type: "cursor-move"; x: number; y: number }
   | { type: "send-message"; text: string };
 
 export type ServerMessage =
   | { type: "session-updated"; session: GameSession }
   | { type: "opponent-cursor"; x: number; y: number; name: string }
+  | { type: "opponent-typing"; guess: string }
   | { type: "new-message"; message: ChatMessage }
   | { type: "error"; message: string };
