@@ -18,6 +18,7 @@ interface GameBoardTileProps extends Tile {
 
 export interface Guess {
   tiles: Tile[];
+  playerName?: string;
 }
 
 const ROWS = EQUATION_LENGTH;

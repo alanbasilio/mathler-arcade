@@ -3,7 +3,11 @@
 import { Button } from "@/components/ui/button";
 import { useGame } from "@/hooks/use-game";
 
-export const Start = () => {
+interface StartProps {
+  onPlayDuo: () => void;
+}
+
+export const Start = ({ onPlayDuo }: StartProps) => {
   const { startGame } = useGame();
   return (
     <div className="flex flex-col gap-6 items-center">
@@ -19,15 +23,26 @@ export const Start = () => {
       >
         Ready to crunch some numbers?
       </p>
-      <Button
-        onClick={startGame}
-        variant="pixel"
-        size="lg"
-        className="text-base md:text-lg lg:text-xl animate-pulse mt-2"
-        data-cy="start"
-      >
-        PRESS TO START
-      </Button>
+      <div className="flex flex-col gap-3 items-center mt-2">
+        <Button
+          onClick={startGame}
+          variant="pixel"
+          size="lg"
+          className="text-base md:text-lg lg:text-xl animate-pulse"
+          data-cy="start"
+        >
+          PLAY SOLO
+        </Button>
+        <Button
+          onClick={onPlayDuo}
+          variant="pixel"
+          size="lg"
+          className="text-base md:text-lg lg:text-xl"
+          data-cy="start-duo"
+        >
+          PLAY DUO
+        </Button>
+      </div>
     </div>
   );
 };
