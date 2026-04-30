@@ -23,7 +23,7 @@ export const Start = ({ onPlayDuo }: StartProps) => {
       >
         Ready to crunch some numbers?
       </p>
-      <div className="flex flex-col gap-3 items-center mt-2">
+      <div className="flex max-md:flex-col gap-3 items-center mt-2">
         <Button
           onClick={startGame}
           variant="pixel"
