@@ -103,26 +103,36 @@ const MultiplayerBoard = () => {
               !isFilled && !isCurrentRow && "opacity-50",
             )}
           >
-            {/* Desktop: name badge to the left of the grid */}
+            {/* Desktop: editorial label column to the left of the grid */}
             {isFilled && (
-              <span
+              <div
                 className={cn(
-                  "hidden md:block absolute right-full top-1/2 -translate-y-1/2 pr-2 text-[9px] font-bold whitespace-nowrap max-w-[96px] truncate text-right",
+                  "hidden md:flex absolute right-full top-1/2 -translate-y-1/2",
+                  "items-center pr-2",
                   isMe ? "text-success" : "text-warning",
                 )}
               >
-                {guess.playerName}
-              </span>
+                <span className="text-[8px] font-bold uppercase tracking-[0.2em] whitespace-nowrap max-w-[72px] truncate opacity-60">
+                  {guess.playerName}
+                </span>
+                <span className="mx-1.5 h-px w-4 shrink-0 bg-current opacity-30" />
+                <span className="text-[8px] opacity-50">▶</span>
+              </div>
             )}
             {isCurrentRow && session?.status === "playing" && (
-              <span
+              <div
                 className={cn(
-                  "hidden md:block absolute right-full top-1/2 -translate-y-1/2 pr-2 text-[9px] font-bold whitespace-nowrap animate-pulse",
+                  "hidden md:flex absolute right-full top-1/2 -translate-y-1/2",
+                  "items-center pr-2 animate-pulse",
                   isMyTurn ? "text-success" : "text-warning",
                 )}
               >
-                {isMyTurn ? "▶ YOU" : `▶ ${currentPlayer?.name ?? ""}`}
-              </span>
+                <span className="text-[8px] font-bold uppercase tracking-[0.2em] whitespace-nowrap">
+                  {isMyTurn ? "you" : (currentPlayer?.name ?? "").slice(0, 9)}
+                </span>
+                <span className="mx-1.5 h-px w-4 shrink-0 bg-current" />
+                <span className="text-[8px]">▶</span>
+              </div>
             )}
 
             {/* Tiles */}
@@ -143,12 +153,14 @@ const MultiplayerBoard = () => {
               );
             })}
 
-            {/* Mobile: inline name indicator to the right of the tiles */}
+            {/* Mobile: compact pill badge to the right of tiles */}
             {isFilled && (
               <span
                 className={cn(
-                  "md:hidden ml-0.5 text-[8px] font-bold whitespace-nowrap max-w-[40px] truncate",
-                  isMe ? "text-success" : "text-warning",
+                  "md:hidden ml-1 px-1 py-0.5 text-[7px] font-bold uppercase tracking-wide whitespace-nowrap max-w-[36px] truncate border",
+                  isMe
+                    ? "border-success/40 text-success/70"
+                    : "border-warning/40 text-warning/70",
                 )}
               >
                 {guess.playerName}
@@ -157,11 +169,13 @@ const MultiplayerBoard = () => {
             {isCurrentRow && session?.status === "playing" && (
               <span
                 className={cn(
-                  "md:hidden ml-0.5 text-[8px] font-bold whitespace-nowrap animate-pulse",
-                  isMyTurn ? "text-success" : "text-warning",
+                  "md:hidden ml-1 px-1 py-0.5 text-[7px] font-bold uppercase tracking-wide whitespace-nowrap border animate-pulse",
+                  isMyTurn
+                    ? "border-success bg-success/10 text-success"
+                    : "border-warning bg-warning/10 text-warning",
                 )}
               >
-                {isMyTurn ? "YOU" : (currentPlayer?.name ?? "")}
+                {isMyTurn ? "you" : (currentPlayer?.name ?? "").slice(0, 6)}
               </span>
             )}
           </div>
