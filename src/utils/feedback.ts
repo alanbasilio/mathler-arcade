@@ -19,10 +19,8 @@ export const computeKeyboardFeedback = (
       updated[char] = "success";
     } else if (charFeedback === "warning" && existing !== "success") {
       updated[char] = "warning";
-    } else if (charFeedback === "destructive" && existing !== "success") {
+    } else if (charFeedback === "destructive" && !existing) {
       updated[char] = "destructive";
-    } else if (charFeedback === "outline" && !existing) {
-      updated[char] = "outline";
     }
   });
 
