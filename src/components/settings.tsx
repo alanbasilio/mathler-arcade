@@ -1,5 +1,8 @@
 "use client";
 
+import { SettingsIcon } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,9 +13,6 @@ import {
 } from "@/components/ui/dialog";
 import { useAudio } from "@/hooks/use-audio";
 import { useGame } from "@/hooks/use-game";
-import { SettingsIcon } from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
 
 export const Settings = () => {
   const { playSound } = useAudio();
@@ -74,7 +74,10 @@ export const Settings = () => {
               </label>
             </div>
           </fieldset>
-          <Button onClick={() => handleOpenChange(false)} data-cy="close-settings">
+          <Button
+            onClick={() => handleOpenChange(false)}
+            data-cy="close-settings"
+          >
             Ok
           </Button>
         </div>

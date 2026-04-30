@@ -1,6 +1,14 @@
 "use client";
 
-import { Guess } from "@/components/game-board";
+import {
+  createContext,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
+import { toast } from "sonner";
+import type { Guess } from "@/components/game-board";
 import { useAudio } from "@/hooks/use-audio";
 import {
   ACTIVE_KEY_TIMEOUT_MS,
@@ -11,7 +19,7 @@ import {
 import { evaluate, isCumulativeSolution } from "@/utils/evaluate";
 import {
   computeKeyboardFeedback,
-  FeedbackColor,
+  type FeedbackColor,
   getFeedback,
 } from "@/utils/feedback";
 import { getNumberOfTheDay } from "@/utils/numbers";
@@ -20,14 +28,6 @@ import {
   validateGuessLength,
   validateHasOperator,
 } from "@/utils/validation";
-import {
-  createContext,
-  ReactNode,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
-import { toast } from "sonner";
 
 export type GameMode = "normal" | "hard";
 
@@ -48,7 +48,7 @@ interface GameContextProps {
 }
 
 export const GameContext = createContext<GameContextProps | undefined>(
-  undefined
+  undefined,
 );
 
 const targetEquation = getNumberOfTheDay();
@@ -56,12 +56,17 @@ const targetResult = evaluate(targetEquation) ?? 0;
 
 type ValidationResult =
   | { valid: true }
-  | { valid: false; kind: "error" | "warning"; title: string; description: string };
+  | {
+      valid: false;
+      kind: "error" | "warning";
+      title: string;
+      description: string;
+    };
 
 const validateGuess = (
   currentGuess: string,
   guesses: Guess[],
-  target: number
+  target: number,
 ): ValidationResult => {
   if (!validateGuessLength(currentGuess))
     return {
@@ -82,11 +87,17 @@ const validateGuess = (
       valid: false,
       kind: "error",
       title: "Error",
-      description: "The equation must contain at least one operator (+, -, *, /)!",
+      description:
+        "The equation must contain at least one operator (+, -, *, /)!",
     };
   const result = evaluate(currentGuess);
   if (result === null)
-    return { valid: false, kind: "error", title: "Error", description: "Try a valid equation!" };
+    return {
+      valid: false,
+      kind: "error",
+      title: "Error",
+      description: "Try a valid equation!",
+    };
   if (result !== target)
     return {
       valid: false,
@@ -126,7 +137,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
       const rawFeedback = getFeedback(guess, targetEquation);
 
       const feedback: FeedbackColor[] = rawFeedback.map((color) =>
-        color === "outline" ? "destructive" : color
+        color === "outline" ? "destructive" : color,
       );
 
       const newGuess: Guess = {
@@ -139,7 +150,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
 
       setGuesses((prev) => [...prev, newGuess]);
       setKeyboardFeedback((prev) =>
-        computeKeyboardFeedback(prev, guess, feedback)
+        computeKeyboardFeedback(prev, guess, feedback),
       );
       setCurrentGuess("");
 
@@ -147,7 +158,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
         setGameOver(true);
       }
     },
-    []
+    [],
   );
 
   const handleSubmitGuess = useCallback(() => {
@@ -163,7 +174,9 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
-    if (isCumulativeSolution(currentGuess.split(""), targetEquation.split(""))) {
+    if (
+      isCumulativeSolution(currentGuess.split(""), targetEquation.split(""))
+    ) {
       playSound("success");
       setGameWon(true);
       return;
@@ -199,7 +212,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
       handleSubmitGuess,
       playSound,
       startGame,
-    ]
+    ],
   );
 
   useEffect(() => {

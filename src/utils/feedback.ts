@@ -1,4 +1,9 @@
-export type FeedbackColor = "outline" | "warning" | "success" | "default" | "destructive";
+export type FeedbackColor =
+  | "outline"
+  | "warning"
+  | "success"
+  | "default"
+  | "destructive";
 
 export const getFeedbackColor = (color?: FeedbackColor): FeedbackColor => {
   return color ?? "default";
@@ -7,7 +12,7 @@ export const getFeedbackColor = (color?: FeedbackColor): FeedbackColor => {
 export const computeKeyboardFeedback = (
   current: Record<string, FeedbackColor>,
   guess: string,
-  feedback: FeedbackColor[]
+  feedback: FeedbackColor[],
 ): Record<string, FeedbackColor> => {
   const updated = { ...current };
 

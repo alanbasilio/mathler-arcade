@@ -1,5 +1,5 @@
-import { AudioContext } from "@/providers/audio-provider";
 import { useContext } from "react";
+import { AudioContext } from "@/providers/audio-provider";
 
 export const useAudio = () => {
   const context = useContext(AudioContext);

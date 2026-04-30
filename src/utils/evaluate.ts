@@ -6,7 +6,7 @@ const CONSECUTIVE_OPERATORS_REGEX = /[+\-*/]{2}/;
  * Returns null for invalid or unsafe expressions.
  */
 const safeEval = (equation: string): number => {
-  const tokens = equation.match(/\d+|[+\-*/]/g)!;
+  const tokens = equation.match(/\d+|[+\-*/]/g) ?? [];
 
   // First pass: resolve * and /
   const simplified: (number | string)[] = [];
@@ -19,7 +19,7 @@ const safeEval = (equation: string): number => {
       simplified.push(token === "*" ? left * right : left / right);
       i += 2;
     } else {
-      simplified.push(isNaN(Number(token)) ? token : Number(token));
+      simplified.push(Number.isNaN(Number(token)) ? token : Number(token));
       i++;
     }
   }
@@ -46,7 +46,7 @@ export const evaluate = (equation: string): number | null => {
 
 export const isCumulativeSolution = (
   arr1: string[],
-  arr2: string[]
+  arr2: string[],
 ): boolean => {
   if (arr1.length !== arr2.length) return false;
   const sortedArr1 = arr1.slice().sort();

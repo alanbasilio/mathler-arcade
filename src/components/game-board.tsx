@@ -1,10 +1,10 @@
 "use client";
 
-import { GameMode } from "@/providers/game-provider";
 import { useGame } from "@/hooks/use-game";
 import { cn } from "@/lib/utils";
+import type { GameMode } from "@/providers/game-provider";
 import { EQUATION_LENGTH } from "@/utils/constants";
-import { FeedbackColor, getFeedbackColor } from "@/utils/feedback";
+import { type FeedbackColor, getFeedbackColor } from "@/utils/feedback";
 
 interface Tile {
   value: string;
@@ -35,7 +35,7 @@ const GameBoardTile = ({ value, color, index, mode }: GameBoardTileProps) => {
           "bg-warning text-warning-foreground": feedbackColor === "warning",
           "bg-accent": feedbackColor === "outline",
           "bg-destructive text-white": feedbackColor === "destructive",
-        }
+        },
       )}
       data-cy={`tile-${index}`}
     >
@@ -67,7 +67,7 @@ const GameBoardRow = ({ rowIndex }: { rowIndex: number }) => {
     >
       {Array.from({ length: COLUMNS }, (_, columnIndex) => (
         <GameBoardTile
-          key={columnIndex}
+          key={`col-${columnIndex}`}
           value={tileValue(rowIndex, columnIndex)}
           color={tileColor(rowIndex, columnIndex)}
           index={columnIndex}
@@ -85,7 +85,7 @@ export const GameBoard = () => {
       data-cy="grid"
     >
       {Array.from({ length: ROWS }, (_, rowIndex) => (
-        <GameBoardRow key={rowIndex} rowIndex={rowIndex} />
+        <GameBoardRow key={`row-${rowIndex}`} rowIndex={rowIndex} />
       ))}
     </div>
   );

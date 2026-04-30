@@ -1,5 +1,8 @@
 "use client";
 
+import { Info } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -9,9 +12,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useAudio } from "@/hooks/use-audio";
-import { Info } from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
 
 export const Tutorial = () => {
   const { playSound } = useAudio();
@@ -31,7 +31,9 @@ export const Tutorial = () => {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="text-foreground">How to Play Mathler</DialogTitle>
+          <DialogTitle className="text-foreground">
+            How to Play Mathler
+          </DialogTitle>
         </DialogHeader>
         <div className="prose space-y-2 text-sm text-foreground">
           <p>

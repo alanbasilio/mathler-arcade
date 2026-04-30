@@ -1,9 +1,9 @@
+import type { Metadata } from "next";
+import { Press_Start_2P } from "next/font/google";
+import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 import { AudioProvider } from "@/providers/audio-provider";
 import { GameProvider } from "@/providers/game-provider";
-import type { Metadata } from "next";
-import { ThemeProvider } from "next-themes";
-import { Press_Start_2P } from "next/font/google";
 import "./globals.css";
 
 const ps2 = Press_Start_2P({ subsets: ["latin"], weight: ["400"] });

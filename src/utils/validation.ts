@@ -9,8 +9,8 @@ export const validateHasOperator = (guess: string): boolean =>
 
 export const isDuplicateGuess = (
   guess: string,
-  previousGuesses: Guess[]
+  previousGuesses: Guess[],
 ): boolean =>
   previousGuesses.some(
-    (g) => g.tiles.map((tile) => tile.value).join("") === guess
+    (g) => g.tiles.map((tile) => tile.value).join("") === guess,
   );

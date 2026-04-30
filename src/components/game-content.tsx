@@ -1,15 +1,23 @@
 "use client";
 
+import {
+  Github,
+  Heart,
+  Moon,
+  MusicIcon,
+  Sun,
+  Volume2,
+  VolumeOff,
+} from "lucide-react";
+import Link from "next/link";
+import { useTheme } from "next-themes";
+import { useMediaQuery } from "usehooks-ts";
 import { GameBoard } from "@/components/game-board";
 import { Keyboard } from "@/components/keyboard";
 import { Settings } from "@/components/settings";
 import { Tutorial } from "@/components/tutorial";
 import { useAudio } from "@/hooks/use-audio";
 import { useGame } from "@/hooks/use-game";
-import { Github, Heart, Moon, MusicIcon, Sun, Volume2, VolumeOff } from "lucide-react";
-import { useTheme } from "next-themes";
-import Link from "next/link";
-import { useMediaQuery } from "usehooks-ts";
 import { Button } from "./ui/button";
 
 export const GameContent = () => {
@@ -91,7 +99,6 @@ export const GameContent = () => {
             href="https://github.com/alanbasilio/mathler-arcade"
             target="_blank"
             className="text-foreground!"
-
           >
             <Github className="size-3" />
             Github
@@ -103,7 +110,6 @@ export const GameContent = () => {
             href="https://vektroid.bandcamp.com/track/420"
             target="_blank"
             className="text-foreground!"
-
           >
             <MusicIcon className="size-3" />
             Music by Macintosh Plus

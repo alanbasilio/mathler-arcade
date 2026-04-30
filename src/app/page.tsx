@@ -1,11 +1,11 @@
 "use client";
 
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { GameContent } from "@/components/game-content";
 import { GameOver } from "@/components/game-over";
 import { Start } from "@/components/start";
 import { RetroGrid } from "@/components/ui/retro-grid";
 import { useGame } from "@/hooks/use-game";
-import { GoogleAnalytics } from "@next/third-parties/google";
 
 export default function Mathler() {
   const { gameStarted, gameOver } = useGame();

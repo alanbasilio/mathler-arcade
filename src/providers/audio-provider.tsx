@@ -1,8 +1,8 @@
 "use client";
 
-import { MC_PLUS_VOLUME, STANDARD_VOLUME } from "@/utils/constants";
-import { createContext, ReactNode, useCallback, useState } from "react";
+import { createContext, type ReactNode, useCallback, useState } from "react";
 import useSound from "use-sound";
+import { MC_PLUS_VOLUME, STANDARD_VOLUME } from "@/utils/constants";
 
 type Sound = "click" | "warning" | "success" | "start" | "back";
 
@@ -13,7 +13,7 @@ interface AudioContextProps {
 }
 
 export const AudioContext = createContext<AudioContextProps | undefined>(
-  undefined
+  undefined,
 );
 
 export const AudioProvider = ({ children }: { children: ReactNode }) => {
@@ -49,7 +49,7 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
       };
       soundMap[sound]();
     },
-    [playClick, playWarning, playSuccess, playMcPlus, playBack]
+    [playClick, playWarning, playSuccess, playMcPlus, playBack],
   );
 
   const toggleAudio = useCallback(() => {

@@ -1,14 +1,15 @@
 import { GAME_START_DATE, MS_PER_DAY } from "./constants";
 
 const isValidDate = (date: Date): boolean =>
-  date instanceof Date && !isNaN(date.getTime());
+  date instanceof Date && !Number.isNaN(date.getTime());
 
 const parseDateParam = (dateParam: string): Date | null => {
   const day = parseInt(dateParam.slice(0, 2), 10);
   const month = parseInt(dateParam.slice(2, 4), 10) - 1; // Months are 0-indexed
   const year = parseInt(dateParam.slice(4), 10);
 
-  if (isNaN(day) || isNaN(month) || isNaN(year)) return null;
+  if (Number.isNaN(day) || Number.isNaN(month) || Number.isNaN(year))
+    return null;
 
   const parsed = new Date(year, month, day);
   const isExactDate =
