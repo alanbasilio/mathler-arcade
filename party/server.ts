@@ -40,22 +40,27 @@ export default class GameServer implements Party.Server {
   }
 
   onMessage(message: string, sender: Party.Connection) {
-    const msg = JSON.parse(message as string);
+    let msg: Record<string, unknown>;
+    try {
+      msg = JSON.parse(message as string);
+    } catch {
+      return;
+    }
     switch (msg.type) {
       case "join":
-        this.handleJoin(sender, msg.name, msg.playerId);
+        this.handleJoin(sender, msg.name as string, msg.playerId as string);
         break;
       case "submit-guess":
-        this.handleSubmitGuess(sender, msg.guess);
+        this.handleSubmitGuess(sender, msg.guess as string);
         break;
       case "typing":
-        this.handleTyping(sender, msg.guess);
+        this.handleTyping(sender, msg.guess as string);
         break;
       case "cursor-move":
-        this.handleCursorMove(sender, msg.x, msg.y);
+        this.handleCursorMove(sender, msg.x as number, msg.y as number);
         break;
       case "send-message":
-        this.handleSendMessage(sender, msg.text);
+        this.handleSendMessage(sender, msg.text as string);
         break;
     }
   }
@@ -200,6 +205,9 @@ export default class GameServer implements Party.Server {
   }
 
   private handleTyping(conn: Party.Connection, guess: string) {
+    if (this.session.status !== "playing") return;
+    const playerId = this.connToPlayer.get(conn.id);
+    if (this.session.currentTurn !== playerId) return;
     for (const connection of this.room.getConnections()) {
       if (connection.id !== conn.id) {
         connection.send(JSON.stringify({ type: "opponent-typing", guess }));

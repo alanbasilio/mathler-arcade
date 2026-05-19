@@ -33,12 +33,13 @@ export const computeKeyboardFeedback = (
 };
 
 export const getFeedback = (guess: string, target: string): FeedbackColor[] => {
-  const feedback: FeedbackColor[] = Array(6).fill("outline");
+  const len = guess.length;
+  const feedback: FeedbackColor[] = Array(len).fill("outline");
   const targetChars = target.split("");
   const guessChars = guess.split("");
 
   // First pass: mark correct positions
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < len; i++) {
     if (guessChars[i] === targetChars[i]) {
       feedback[i] = "success";
       targetChars[i] = "";
@@ -47,7 +48,7 @@ export const getFeedback = (guess: string, target: string): FeedbackColor[] => {
   }
 
   // Second pass: mark correct characters in wrong positions
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < len; i++) {
     if (guessChars[i] !== "") {
       const index = targetChars.indexOf(guessChars[i]);
       if (index !== -1) {

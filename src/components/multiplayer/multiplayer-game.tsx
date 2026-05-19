@@ -192,7 +192,7 @@ const MultiplayerBoard = () => {
 const MultiplayerKeyboard = () => {
   const { handleKeyPress, keyboardFeedback, isMyTurn, currentGuess } =
     useMultiplayer();
-  const highlightEnter = currentGuess.length === EQUATION_LENGTH;
+  const highlightEnter = isMyTurn && currentGuess.length === EQUATION_LENGTH;
 
   const renderKey = (key: string) => (
     <Button
@@ -232,24 +232,39 @@ const GameOverBanner = () => {
   const won = session.winner === myPlayer?.name;
   const abandoned = session.winner && !session.guesses.length;
 
+  const handleNewGame = () => {
+    window.location.href = window.location.origin;
+  };
+
   return (
-    <div
-      className={cn(
-        "w-full px-4 py-3 border-4 font-bold text-center text-xs md:text-sm",
-        won
-          ? "border-success bg-success/10 text-success"
-          : "border-destructive bg-destructive/10 text-destructive",
-      )}
-    >
-      {abandoned ? (
-        <>Opponent disconnected. You win!</>
-      ) : won ? (
-        <>You solved it! Well done, {myPlayer?.name}!</>
-      ) : session.winner ? (
-        <>{session.winner} solved it first. Better luck next time!</>
-      ) : (
-        <>No more guesses. Game over!</>
-      )}
+    <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/90 backdrop-blur-sm border-4 border-foreground">
+      <div
+        className={cn(
+          "flex flex-col items-center gap-4 px-6 py-5 text-center",
+          won ? "text-success" : "text-destructive",
+        )}
+      >
+        <p className="text-2xl md:text-3xl font-bold tracking-tight italic leading-none">
+          {won ? "You Win!" : "Game Over"}
+        </p>
+        <p className="text-xs md:text-sm font-bold opacity-80 max-w-[200px] leading-snug">
+          {abandoned
+            ? "Opponent disconnected."
+            : won
+              ? `Well done, ${myPlayer?.name}!`
+              : session.winner
+                ? `${session.winner} solved it first.`
+                : "No more guesses."}
+        </p>
+        <Button
+          variant="pixel"
+          size="sm"
+          onClick={handleNewGame}
+          className="mt-1"
+        >
+          New Game
+        </Button>
+      </div>
     </div>
   );
 };
@@ -299,9 +314,11 @@ export const MultiplayerGame = () => {
       {session?.status !== "waiting" && (
         <div className="flex gap-6 items-start">
           <div className="flex flex-col gap-3 items-center">
-            <MultiplayerBoard />
+            <div className="relative">
+              <MultiplayerBoard />
+              <GameOverBanner />
+            </div>
             <MultiplayerKeyboard />
-            <GameOverBanner />
           </div>
           <ChatSidebar />
         </div>

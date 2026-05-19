@@ -25,7 +25,7 @@ export const Lobby = ({ sessionId }: LobbyProps) => {
 
   const inviteUrl =
     typeof window !== "undefined" && session
-      ? `${window.location.origin}/?session=${new URLSearchParams(window.location.search).get("session")}`
+      ? `${window.location.origin}?session=${new URLSearchParams(window.location.search).get("session") ?? ""}`
       : "";
 
   if (session?.status === "waiting" && !isJoining) {

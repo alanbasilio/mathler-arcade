@@ -1,9 +1,10 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useGame } from "@/hooks/use-game";
 
 export const GameOver = () => {
-  const { targetEquation, targetResult } = useGame();
+  const { targetEquation, targetResult, resetGame } = useGame();
 
   return (
     <>
@@ -21,6 +22,9 @@ export const GameOver = () => {
             {targetEquation} = {targetResult}
           </p>
         </div>
+        <Button variant="pixel" size="lg" onClick={resetGame}>
+          Play Again
+        </Button>
       </div>
     </>
   );

@@ -5,6 +5,7 @@ import {
   type ReactNode,
   useCallback,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 import { toast } from "sonner";
@@ -42,6 +43,7 @@ interface GameContextProps {
   keyboardFeedback: Record<string, FeedbackColor>;
   handleKeyPress: (key: string) => void;
   startGame: () => void;
+  resetGame: () => void;
   targetResult: number;
   targetEquation: string;
   activeKey: string;
@@ -50,9 +52,6 @@ interface GameContextProps {
 export const GameContext = createContext<GameContextProps | undefined>(
   undefined,
 );
-
-const targetEquation = getNumberOfTheDay();
-const targetResult = evaluate(targetEquation) ?? 0;
 
 type ValidationResult =
   | { valid: true }
@@ -121,6 +120,14 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
   const [activeKey, setActiveKey] = useState<string>("");
   const { playSound } = useAudio();
 
+  // Computed once on mount — avoids module-level side effects that run at
+  // import time and can cause SSR/client hydration mismatches.
+  const targetEquation = useMemo(() => getNumberOfTheDay(), []);
+  const targetResult = useMemo(
+    () => evaluate(targetEquation) ?? 0,
+    [targetEquation],
+  );
+
   useEffect(() => {
     if (!activeKey) return;
     const timer = setTimeout(() => setActiveKey(""), ACTIVE_KEY_TIMEOUT_MS);
@@ -158,7 +165,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
         setGameOver(true);
       }
     },
-    [],
+    [targetEquation],
   );
 
   const handleSubmitGuess = useCallback(() => {
@@ -183,7 +190,25 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     }
 
     processValidGuessFeedback(currentGuess, guesses.length);
-  }, [currentGuess, gameOver, guesses, playSound, processValidGuessFeedback]);
+  }, [
+    currentGuess,
+    gameOver,
+    guesses,
+    playSound,
+    processValidGuessFeedback,
+    targetEquation,
+    targetResult,
+  ]);
+
+  const resetGame = useCallback(() => {
+    setGameStarted(false);
+    setGuesses([]);
+    setCurrentGuess("");
+    setGameOver(false);
+    setGameWon(false);
+    setKeyboardFeedback({});
+    setActiveKey("");
+  }, []);
 
   const handleKeyPress = useCallback(
     (key: string) => {
@@ -240,6 +265,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
         keyboardFeedback,
         handleKeyPress,
         startGame,
+        resetGame,
         targetResult,
         targetEquation,
         activeKey,
