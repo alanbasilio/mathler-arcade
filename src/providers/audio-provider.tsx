@@ -47,6 +47,10 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
   const [radioPlaying, setRadioPlaying] = useState<boolean>(true);
   const [ambientActive, setAmbientActive] = useState(false);
   const [nowPlayingPosition, setNowPlayingPosition] = useState(0);
+  // Base position used by the tick interval.
+  // First load → real API position; song change during session → 0.
+  const positionBaseRef = useRef(0);
+  const prevSongIdRef = useRef<string | null>(null);
 
   const audioVolume = stopAudio ? 0 : STANDARD_VOLUME;
 
@@ -93,9 +97,25 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (!nowPlaying) {
       setNowPlayingPosition(0);
+      positionBaseRef.current = 0;
+      prevSongIdRef.current = null;
       return;
     }
-    setNowPlayingPosition(nowPlaying.position);
+
+    const isSongChange =
+      prevSongIdRef.current !== null && prevSongIdRef.current !== nowPlaying.id;
+
+    prevSongIdRef.current = nowPlaying.id;
+
+    if (isSongChange) {
+      // Song changed mid-session: always count from 0
+      positionBaseRef.current = 0;
+      setNowPlayingPosition(0);
+    } else {
+      // First load / same song re-polled: use real broadcast position
+      positionBaseRef.current = nowPlaying.position;
+      setNowPlayingPosition(nowPlaying.position);
+    }
   }, [nowPlaying]);
 
   // ─── Tick local position every second ────────────────────────────────────
@@ -105,7 +125,7 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
     const tickId = window.setInterval(() => {
       const elapsed = (Date.now() - dataUpdatedAt) / 1000;
       setNowPlayingPosition(
-        Math.min(nowPlaying.length, nowPlaying.position + elapsed),
+        Math.min(nowPlaying.length, positionBaseRef.current + elapsed),
       );
     }, PLAZA_POSITION_TICK_MS);
 

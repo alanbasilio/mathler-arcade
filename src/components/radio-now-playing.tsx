@@ -96,7 +96,7 @@ export const RadioNowPlaying = () => {
           )}
         </div>
 
-        {/* Time display: elapsed / total */}
+        {/* Time display */}
         <div className="shrink-0 flex items-center gap-1 font-mono tabular-nums select-none">
           <span className="text-foreground/70 text-[0.6rem]">
             {formatRadioTime(elapsed)}
