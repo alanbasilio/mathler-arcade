@@ -116,12 +116,12 @@ export const GameContent = () => {
         <span className="text-foreground!">|</span>
         <Button asChild variant="link" size="xs">
           <Link
-            href="https://vektroid.bandcamp.com/track/420"
+            href="https://plaza.one/"
             target="_blank"
             className="text-foreground!"
           >
             <MusicIcon className="size-3" />
-            Music by Macintosh Plus
+            Radio by Nightwave Plaza
           </Link>
         </Button>
         <span className="text-foreground!">|</span>

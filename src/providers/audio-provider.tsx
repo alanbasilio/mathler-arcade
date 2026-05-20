@@ -1,8 +1,19 @@
 "use client";
 
-import { createContext, type ReactNode, useCallback, useState } from "react";
+import {
+  createContext,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import useSound from "use-sound";
-import { MC_PLUS_VOLUME, STANDARD_VOLUME } from "@/utils/constants";
+import {
+  AMBIENT_VOLUME,
+  NIGHTWAVE_PLAZA_STREAM_URL,
+  STANDARD_VOLUME,
+} from "@/utils/constants";
 
 type Sound = "click" | "warning" | "success" | "start" | "back";
 
@@ -19,37 +30,91 @@ export const AudioContext = createContext<AudioContextProps | undefined>(
 export const AudioProvider = ({ children }: { children: ReactNode }) => {
   const [stopAudio, setStopAudio] = useState<boolean>(false);
   const audioVolume = stopAudio ? 0 : STANDARD_VOLUME;
-  const mcPlusAudioVolume = stopAudio ? 0 : MC_PLUS_VOLUME;
+
+  const radioRef = useRef<HTMLAudioElement | null>(null);
+  const hlsRef = useRef<{ destroy: () => void } | null>(null);
+  const ambientStartedRef = useRef(false);
 
   const soundFiles = {
     click: "/mp3/click.mp3",
     warning: "/mp3/warning.mp3",
     success: "/mp3/success.mp3",
-    start: "/mp3/mc-plus.mp3",
     back: "/mp3/back.mp3",
   };
 
   const [playClick] = useSound(soundFiles.click, { volume: audioVolume });
   const [playWarning] = useSound(soundFiles.warning, { volume: audioVolume });
   const [playSuccess] = useSound(soundFiles.success, { volume: audioVolume });
-  const [playMcPlus] = useSound(soundFiles.start, {
-    volume: mcPlusAudioVolume,
-    loop: true,
-  });
   const [playBack] = useSound(soundFiles.back, { volume: audioVolume });
+
+  useEffect(() => {
+    let mounted = true;
+    const audio = new Audio();
+    radioRef.current = audio;
+
+    const setupStream = async () => {
+      const { default: Hls } = await import("hls.js");
+      if (!mounted) return;
+
+      if (Hls.isSupported()) {
+        const hls = new Hls();
+        hlsRef.current = hls;
+        hls.loadSource(NIGHTWAVE_PLAZA_STREAM_URL);
+        hls.attachMedia(audio);
+        return;
+      }
+
+      if (audio.canPlayType("application/vnd.apple.mpegurl")) {
+        audio.src = NIGHTWAVE_PLAZA_STREAM_URL;
+      }
+    };
+
+    void setupStream();
+
+    return () => {
+      mounted = false;
+      hlsRef.current?.destroy();
+      hlsRef.current = null;
+      audio.pause();
+      audio.removeAttribute("src");
+      radioRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    const audio = radioRef.current;
+    if (!audio || !ambientStartedRef.current) return;
+
+    if (stopAudio) {
+      audio.pause();
+      return;
+    }
+
+    audio.volume = AMBIENT_VOLUME;
+    void audio.play();
+  }, [stopAudio]);
+
+  const playAmbient = useCallback(() => {
+    ambientStartedRef.current = true;
+    const audio = radioRef.current;
+    if (!audio || stopAudio) return;
+
+    audio.volume = AMBIENT_VOLUME;
+    void audio.play();
+  }, [stopAudio]);
 
   const playSound = useCallback(
     (sound: Sound) => {
-      const soundMap: { [key in Sound]: () => void } = {
+      const soundMap: Record<Sound, () => void> = {
         click: playClick,
         warning: playWarning,
         success: playSuccess,
-        start: playMcPlus,
+        start: playAmbient,
         back: playBack,
       };
       soundMap[sound]();
     },
-    [playClick, playWarning, playSuccess, playMcPlus, playBack],
+    [playClick, playWarning, playSuccess, playAmbient, playBack],
   );
 
   const toggleAudio = useCallback(() => {

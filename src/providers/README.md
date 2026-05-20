@@ -29,8 +29,7 @@ handleKeyPress("Enter") → handleSubmitGuess()
 
 ## AudioProvider
 
-Wraps `use-sound` hooks for five clips: `click`, `back`, `warning`, `success`, `start` (looping background music).
+Wraps `use-sound` for SFX (`click`, `back`, `warning`, `success`) and HLS ambient radio on `start`.
 
-- `playSound(name)` dispatches to the correct clip.
-- `toggleAudio()` sets volume to 0 or restores it to `STANDARD_VOLUME`.
-- The `start` clip uses `MC_PLUS_VOLUME` (quieter background music).
+- `playSound("start")` plays the [Nightwave Plaza](https://plaza.one/) stream (`NIGHTWAVE_PLAZA_STREAM_URL`).
+- `toggleAudio()` mutes/unmutes SFX and pauses/resumes the radio.

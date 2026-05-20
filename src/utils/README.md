@@ -11,7 +11,8 @@ All magic values in one place:
 - `ACTIVE_KEY_TIMEOUT_MS = 100` — key press animation duration
 - `GAME_START_DATE` — base date for daily puzzle index (2022-01-01)
 - `MS_PER_DAY` — milliseconds per day
-- `STANDARD_VOLUME / MC_PLUS_VOLUME` — audio volume levels
+- `STANDARD_VOLUME / AMBIENT_VOLUME` — SFX and radio volume levels
+- `NIGHTWAVE_PLAZA_STREAM_URL` — HLS ambient radio stream
 - `VALID_KEYS` — accepted keyboard inputs
 
 ### `evaluate.ts`
