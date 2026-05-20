@@ -7,6 +7,9 @@ export const STANDARD_VOLUME = 0.4;
 export const AMBIENT_VOLUME = 0.35;
 export const NIGHTWAVE_PLAZA_STREAM_URL =
   "https://radio.plaza.one/aac_hifi.m3u8";
+export const PLAZA_STATUS_URL = "https://api.plaza.one/status";
+export const PLAZA_STATUS_POLL_MS = 8_000;
+export const PLAZA_POSITION_TICK_MS = 1_000;
 export const VALID_KEYS = [
   "Enter",
   "Backspace",

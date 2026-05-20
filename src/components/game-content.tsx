@@ -11,12 +11,13 @@ import { Settings } from "@/components/settings";
 import { Tutorial } from "@/components/tutorial";
 import { useAudio } from "@/hooks/use-audio";
 import { useGame } from "@/hooks/use-game";
+import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
 
 export const GameContent = () => {
   const { theme, setTheme } = useTheme();
   const { gameWon, targetResult, targetEquation, revealEquation } = useGame();
-  const { stopAudio, toggleAudio, playSound } = useAudio();
+  const { stopAudio, toggleAudio, playSound, ambientActive } = useAudio();
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const handleThemeToggle = () => {
@@ -28,7 +29,12 @@ export const GameContent = () => {
   const AudioIcon = stopAudio ? VolumeOff : Volume2;
 
   return (
-    <div className="flex flex-col gap-6 p-4 z-10 items-center">
+    <div
+      className={cn(
+        "flex flex-col gap-6 p-4 z-10 items-center",
+        ambientActive && "pb-12",
+      )}
+    >
       <div className="text-center space-y-2">
         <div className="flex gap-4 items-center justify-center">
           <Tutorial />
@@ -37,7 +43,7 @@ export const GameContent = () => {
             onClick={handleThemeToggle}
             className="hover:text-foreground"
           >
-            <ThemeToggleIcon className="lg:absolute lg:right-5 lg:bottom-5" />
+            <ThemeToggleIcon className="lg:absolute lg:right-5 lg:bottom-14" />
           </Link>
           <h1
             className="text-foreground text-3xl md:text-4xl lg:text-5xl xl:text-6xl italic leading-none tracking-tighter"
@@ -51,7 +57,7 @@ export const GameContent = () => {
             onClick={toggleAudio}
             className="hover:text-foreground"
           >
-            <AudioIcon className="lg:absolute lg:left-5 lg:bottom-5" />
+            <AudioIcon className="lg:absolute lg:left-5 lg:bottom-14" />
           </Link>
         </div>
         <h2

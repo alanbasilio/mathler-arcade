@@ -12,7 +12,8 @@ All magic values in one place:
 - `GAME_START_DATE` — base date for daily puzzle index (2022-01-01)
 - `MS_PER_DAY` — milliseconds per day
 - `STANDARD_VOLUME / AMBIENT_VOLUME` — SFX and radio volume levels
-- `NIGHTWAVE_PLAZA_STREAM_URL` — HLS ambient radio stream
+- `NIGHTWAVE_PLAZA_STREAM_URL` / `PLAZA_STATUS_URL` — stream and now-playing API
+- `plaza-radio.ts` — `fetchPlazaStatus`, time formatting, position interpolation
 - `VALID_KEYS` — accepted keyboard inputs
 
 ### `evaluate.ts`

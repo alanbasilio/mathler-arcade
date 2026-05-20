@@ -29,7 +29,8 @@ handleKeyPress("Enter") → handleSubmitGuess()
 
 ## AudioProvider
 
-Wraps `use-sound` for SFX (`click`, `back`, `warning`, `success`) and HLS ambient radio on `start`.
+Wraps `use-sound` for SFX and HLS ambient radio on `start`.
 
-- `playSound("start")` plays the [Nightwave Plaza](https://plaza.one/) stream (`NIGHTWAVE_PLAZA_STREAM_URL`).
-- `toggleAudio()` mutes/unmutes SFX and pauses/resumes the radio.
+- `playSound("start")` plays the [Nightwave Plaza](https://plaza.one/) stream.
+- Polls `PLAZA_STATUS_URL` for `nowPlaying` (title, artist, length, position, artwork).
+- `RadioNowPlaying` shows the current track and progress bar.

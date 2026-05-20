@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { GameContent } from "@/components/game-content";
 import { GameOver } from "@/components/game-over";
 import { MultiplayerRoot } from "@/components/multiplayer/multiplayer-root";
+import { RadioNowPlaying } from "@/components/radio-now-playing";
 import { Start } from "@/components/start";
 import { RetroGrid } from "@/components/ui/retro-grid";
 import { useGame } from "@/hooks/use-game";
@@ -47,7 +48,10 @@ export default function Mathler() {
         gameOver ? (
           <GameOver />
         ) : (
-          <GameContent />
+          <>
+            <GameContent />
+            <RadioNowPlaying />
+          </>
         )
       ) : (
         <Start onPlayDuo={() => setMultiplayerMode(true)} />
