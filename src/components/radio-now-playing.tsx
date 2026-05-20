@@ -1,6 +1,6 @@
 "use client";
 
-import { Pause, Play } from "lucide-react";
+import { Pause, Play, Volume1, Volume2, VolumeX } from "lucide-react";
 import Image from "next/image";
 import { useAudio } from "@/hooks/use-audio";
 import { formatRadioTime } from "@/utils/plaza-radio";
@@ -12,6 +12,8 @@ export const RadioNowPlaying = () => {
     nowPlayingPosition,
     radioPlaying,
     toggleRadio,
+    radioVolume,
+    setRadioVolume,
   } = useAudio();
 
   if (!ambientActive || !nowPlaying) return null;
@@ -21,6 +23,9 @@ export const RadioNowPlaying = () => {
   const progress = total > 0 ? Math.min(100, (elapsed / total) * 100) : 0;
   const trackLabel = `${nowPlaying.title} — ${nowPlaying.artist}`;
   const isLong = trackLabel.length > 42;
+
+  const VolumeIcon =
+    radioVolume === 0 ? VolumeX : radioVolume < 0.5 ? Volume1 : Volume2;
 
   return (
     <div
@@ -106,6 +111,21 @@ export const RadioNowPlaying = () => {
             {formatRadioTime(total)}
           </span>
         </div>
+
+        {/* Volume control */}
+        <div className="shrink-0 flex items-center gap-1.5">
+          <VolumeIcon className="size-3 text-foreground/40 shrink-0" />
+          <input
+            type="range"
+            min={0}
+            max={1}
+            step={0.05}
+            value={radioVolume}
+            onChange={(e) => setRadioVolume(Number(e.target.value))}
+            aria-label="Radio volume"
+            className="radio-volume-slider"
+          />
+        </div>
       </div>
 
       <style>{`
@@ -115,6 +135,36 @@ export const RadioNowPlaying = () => {
         }
         .radio-marquee {
           animation: radio-marquee 14s linear infinite;
+        }
+        .radio-volume-slider {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 56px;
+          height: 2px;
+          background: color-mix(in oklch, var(--foreground) 20%, transparent);
+          outline: none;
+          cursor: pointer;
+        }
+        .radio-volume-slider::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 8px;
+          height: 8px;
+          background: color-mix(in oklch, var(--foreground) 60%, transparent);
+          cursor: pointer;
+        }
+        .radio-volume-slider::-moz-range-thumb {
+          width: 8px;
+          height: 8px;
+          background: color-mix(in oklch, var(--foreground) 60%, transparent);
+          border: none;
+          cursor: pointer;
+        }
+        .radio-volume-slider:hover::-webkit-slider-thumb {
+          background: var(--foreground);
+        }
+        .radio-volume-slider:hover::-moz-range-thumb {
+          background: var(--foreground);
         }
       `}</style>
     </div>

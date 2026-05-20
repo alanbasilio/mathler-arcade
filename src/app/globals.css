@@ -53,6 +53,102 @@
   --animate-grid: grid 15s linear infinite;
   --animate-shake: shake 0.4s ease-in-out;
   --animate-pop: pop 0.15s ease-out;
+  --animate-glitch: glitch 5s linear infinite;
+  --animate-tile-flip: tile-flip 0.5s ease-in-out both;
+  --animate-tile-pop: tile-pop 0.08s ease-out both;
+  --animate-tile-bounce: tile-bounce 0.6s ease-in-out both;
+  --animate-blink-border: blink-border 1s step-start infinite;
+  --animate-flash-title: flash-title 1.2s ease-in-out 3;
+  @keyframes glitch {
+    0%,
+    88%,
+    100% {
+      text-shadow: none;
+    }
+    90% {
+      text-shadow:
+        -3px 0 #ff2d55,
+        3px 0 #00e5ff;
+    }
+    92% {
+      text-shadow:
+        3px 0 #ff2d55,
+        -2px 0 #00e5ff;
+    }
+    94% {
+      text-shadow: -1px 0 #00e5ff;
+    }
+    96% {
+      text-shadow: none;
+    }
+  }
+  @keyframes tile-flip {
+    0% {
+      transform: rotateX(0deg);
+    }
+    45% {
+      transform: rotateX(-90deg);
+    }
+    55% {
+      transform: rotateX(-90deg);
+    }
+    100% {
+      transform: rotateX(0deg);
+    }
+  }
+  @keyframes tile-pop {
+    0% {
+      transform: scale(1);
+    }
+    40% {
+      transform: scale(1.18);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  @keyframes tile-bounce {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    30% {
+      transform: translateY(-14px);
+    }
+    60% {
+      transform: translateY(-6px);
+    }
+  }
+  @keyframes blink-border {
+    0%,
+    100% {
+      border-color: var(--foreground);
+    }
+    50% {
+      border-color: var(--border);
+    }
+  }
+  @keyframes flash-title {
+    0%,
+    100% {
+      opacity: 1;
+      color: var(--foreground);
+    }
+    10% {
+      opacity: 0.6;
+      color: #ff2d55;
+    }
+    20% {
+      opacity: 1;
+    }
+    30% {
+      opacity: 0.8;
+      color: #ff2d55;
+    }
+    40% {
+      opacity: 1;
+    }
+  }
   @keyframes grid {
     0% {
       transform: translateY(-50%);
@@ -183,4 +279,23 @@
   html {
     @apply font-sans;
   }
+}
+
+/* ─── CRT overlay ─────────────────────────────────────────── */
+.crt-scanlines {
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.04) 2px,
+    rgba(0, 0, 0, 0.04) 4px
+  );
+}
+
+.crt-vignette {
+  background: radial-gradient(
+    ellipse at center,
+    transparent 55%,
+    rgba(0, 0, 0, 0.38) 100%
+  );
 }

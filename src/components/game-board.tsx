@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { useGame } from "@/hooks/use-game";
 import { cn } from "@/lib/utils";
 import type { GameMode } from "@/providers/game-provider";
@@ -14,6 +15,11 @@ interface Tile {
 
 interface GameBoardTileProps extends Tile {
   mode: GameMode;
+  isRevealing: boolean;
+  revealDelay: number;
+  isBouncing: boolean;
+  bounceDelay: number;
+  isActiveCursor: boolean;
 }
 
 export interface Guess {
@@ -24,7 +30,17 @@ export interface Guess {
 const ROWS = EQUATION_LENGTH;
 const COLUMNS = EQUATION_LENGTH;
 
-const GameBoardTile = ({ value, color, index, mode }: GameBoardTileProps) => {
+const GameBoardTile = ({
+  value,
+  color,
+  index,
+  mode,
+  isRevealing,
+  revealDelay,
+  isBouncing,
+  bounceDelay,
+  isActiveCursor,
+}: GameBoardTileProps) => {
   const feedbackColor = getFeedbackColor(color);
 
   return (
@@ -37,7 +53,17 @@ const GameBoardTile = ({ value, color, index, mode }: GameBoardTileProps) => {
           "bg-accent": feedbackColor === "outline",
           "bg-destructive text-white": feedbackColor === "destructive",
         },
+        isActiveCursor && "animate-blink-border",
+        isRevealing && "animate-tile-flip",
+        isBouncing && "animate-tile-bounce",
       )}
+      style={{
+        animationDelay: isRevealing
+          ? `${revealDelay}ms`
+          : isBouncing
+            ? `${bounceDelay}ms`
+            : undefined,
+      }}
       data-cy={`tile-${index}`}
     >
       {value}
@@ -45,48 +71,92 @@ const GameBoardTile = ({ value, color, index, mode }: GameBoardTileProps) => {
   );
 };
 
-const GameBoardRow = ({ rowIndex }: { rowIndex: number }) => {
-  const { guesses, currentGuess, mode } = useGame();
+interface GameBoardRowProps {
+  rowIndex: number;
+  revealingRow: number | null;
+}
+
+const GameBoardRow = ({ rowIndex, revealingRow }: GameBoardRowProps) => {
+  const { guesses, currentGuess, mode, gameWon } = useGame();
 
   const isCurrentRow = rowIndex === guesses.length;
   const isFilled = Boolean(guesses[rowIndex]);
+  const isRevealingRow = revealingRow === rowIndex;
+  const isWinningRow = gameWon && rowIndex === guesses.length - 1;
 
-  const tileValue = (rowIndex: number, columnIndex: number) => {
-    if (isFilled) return guesses[rowIndex].tiles[columnIndex].value;
-    if (isCurrentRow) return currentGuess[columnIndex] || "";
+  const tileValue = (col: number) => {
+    if (isFilled) return guesses[rowIndex].tiles[col].value;
+    if (isCurrentRow) return currentGuess[col] ?? "";
     return "";
   };
 
-  const tileColor = (rowIndex: number, columnIndex: number): FeedbackColor =>
-    isFilled ? guesses[rowIndex].tiles[columnIndex].color : "default";
+  const tileColor = (col: number): FeedbackColor =>
+    isFilled ? guesses[rowIndex].tiles[col].color : "default";
 
   return (
     <div
-      key={rowIndex}
       className={cn("flex gap-2", !isFilled && !isCurrentRow && "opacity-50")}
+      style={{ perspective: "400px" }}
       data-cy={`row-${rowIndex}`}
     >
-      {Array.from({ length: COLUMNS }, (_, columnIndex) => (
-        <GameBoardTile
-          key={`col-${columnIndex}`}
-          value={tileValue(rowIndex, columnIndex)}
-          color={tileColor(rowIndex, columnIndex)}
-          index={columnIndex}
-          mode={mode}
-        />
-      ))}
+      {Array.from({ length: COLUMNS }, (_, col) => {
+        const val = tileValue(col);
+        const isActiveCursor =
+          isCurrentRow && col === currentGuess.length && !gameWon;
+
+        return (
+          <GameBoardTile
+            // Re-key on value change so tile-pop animation re-fires on each keystroke
+            key={`col-${col}-${isCurrentRow ? val : "filled"}`}
+            value={val}
+            color={tileColor(col)}
+            index={col}
+            mode={mode}
+            isRevealing={isRevealingRow}
+            revealDelay={col * 120}
+            isBouncing={isWinningRow}
+            bounceDelay={col * 80}
+            isActiveCursor={isActiveCursor}
+          />
+        );
+      })}
     </div>
   );
 };
 
 export const GameBoard = () => {
+  const { guesses } = useGame();
+  const [revealingRow, setRevealingRow] = useState<number | null>(null);
+  const prevGuessesLenRef = useRef(0);
+
+  useEffect(() => {
+    const prev = prevGuessesLenRef.current;
+    const curr = guesses.length;
+
+    if (curr > prev) {
+      setRevealingRow(curr - 1);
+      const timeout = setTimeout(
+        () => setRevealingRow(null),
+        COLUMNS * 120 + 300,
+      );
+      prevGuessesLenRef.current = curr;
+      return () => clearTimeout(timeout);
+    }
+
+    prevGuessesLenRef.current = curr;
+  }, [guesses.length]);
+
   return (
     <div
       className="grid grid-rows-6 gap-2 bg-background/20 backdrop-blur-sm border-4 border-foreground p-2"
       data-cy="grid"
     >
       {Array.from({ length: ROWS }, (_, rowIndex) => (
-        <GameBoardRow key={`row-${rowIndex}`} rowIndex={rowIndex} />
+        <GameBoardRow
+          key={`row-${rowIndex}`}
+          rowIndex={rowIndex}
+          revealingRow={revealingRow}
+        />
       ))}
     </div>
   );

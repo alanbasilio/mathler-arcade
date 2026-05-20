@@ -36,6 +36,8 @@ interface AudioContextProps {
   /** Controls only the radio stream — independent of game sound effects. */
   radioPlaying: boolean;
   toggleRadio: () => void;
+  radioVolume: number;
+  setRadioVolume: (volume: number) => void;
 }
 
 export const AudioContext = createContext<AudioContextProps | undefined>(
@@ -45,6 +47,7 @@ export const AudioContext = createContext<AudioContextProps | undefined>(
 export const AudioProvider = ({ children }: { children: ReactNode }) => {
   const [stopAudio, setStopAudio] = useState<boolean>(false);
   const [radioPlaying, setRadioPlaying] = useState<boolean>(true);
+  const [radioVolume, setRadioVolume] = useState<number>(AMBIENT_VOLUME);
   const [ambientActive, setAmbientActive] = useState(false);
   const [nowPlayingPosition, setNowPlayingPosition] = useState(0);
   // Base position used by the tick interval.
@@ -177,9 +180,16 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
-    audio.volume = AMBIENT_VOLUME;
+    audio.volume = radioVolume;
     void audio.play();
-  }, [ambientActive, radioPlaying]);
+  }, [ambientActive, radioPlaying, radioVolume]);
+
+  // ─── Sync volume on the audio element whenever it changes ────────────────
+  useEffect(() => {
+    if (radioRef.current) {
+      radioRef.current.volume = radioVolume;
+    }
+  }, [radioVolume]);
 
   const playAmbient = useCallback(() => {
     setAmbientActive(true);
@@ -220,6 +230,8 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
         nowPlayingPosition,
         radioPlaying,
         toggleRadio,
+        radioVolume,
+        setRadioVolume,
       }}
     >
       {children}

@@ -29,6 +29,14 @@ export default function RootLayout({
       className={cn("font-sans", geist.variable)}
     >
       <body className={`${ps2.className} antialiased`}>
+        {/* CRT overlay — always on top, never blocks interaction */}
+        <div
+          aria-hidden
+          className="pointer-events-none fixed inset-0 z-[200] overflow-hidden"
+        >
+          <div className="crt-scanlines absolute inset-0" />
+          <div className="crt-vignette absolute inset-0" />
+        </div>
         <ThemeProvider attribute="class" defaultTheme="light">
           <ReactQueryProvider>
             <AudioProvider>
