@@ -2,7 +2,6 @@
 
 import { Pause, Play } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { useAudio } from "@/hooks/use-audio";
 import { formatRadioTime } from "@/utils/plaza-radio";
 
@@ -11,15 +10,14 @@ export const RadioNowPlaying = () => {
     ambientActive,
     nowPlaying,
     nowPlayingPosition,
-    stopAudio,
-    toggleAudio,
+    radioPlaying,
+    toggleRadio,
   } = useAudio();
 
   if (!ambientActive || !nowPlaying) return null;
 
   const elapsed = nowPlayingPosition;
   const total = nowPlaying.length;
-  const remaining = Math.max(0, total - elapsed);
   const progress = total > 0 ? Math.min(100, (elapsed / total) * 100) : 0;
   const trackLabel = `${nowPlaying.title} — ${nowPlaying.artist}`;
   const isLong = trackLabel.length > 42;
@@ -42,14 +40,14 @@ export const RadioNowPlaying = () => {
         {/* Play / Pause */}
         <button
           type="button"
-          onClick={toggleAudio}
-          aria-label={stopAudio ? "Play" : "Pause"}
-          className="shrink-0 flex items-center justify-center text-foreground/50 hover:text-foreground/90 transition-colors"
+          onClick={toggleRadio}
+          aria-label={radioPlaying ? "Pause radio" : "Play radio"}
+          className="shrink-0 flex items-center justify-center w-7 h-7 rounded-sm text-foreground/50 hover:text-foreground/90 hover:bg-foreground/6 transition-colors"
         >
-          {stopAudio ? (
-            <Play className="size-3 fill-current" />
+          {radioPlaying ? (
+            <Pause className="size-4 fill-current" />
           ) : (
-            <Pause className="size-3 fill-current" />
+            <Play className="size-4 fill-current" />
           )}
         </button>
 
@@ -98,7 +96,7 @@ export const RadioNowPlaying = () => {
           )}
         </div>
 
-        {/* Time display: elapsed · total · −remaining */}
+        {/* Time display: elapsed / total */}
         <div className="shrink-0 flex items-center gap-1 font-mono tabular-nums select-none">
           <span className="text-foreground/70 text-[0.6rem]">
             {formatRadioTime(elapsed)}
@@ -107,20 +105,7 @@ export const RadioNowPlaying = () => {
           <span className="text-foreground/40 text-[0.6rem]">
             {formatRadioTime(total)}
           </span>
-          <span className="text-foreground/15 text-[0.5rem] mx-0.5">·</span>
-          <span className="text-foreground/30 text-[0.6rem]">
-            -{formatRadioTime(remaining)}
-          </span>
         </div>
-
-        {/* Plaza attribution */}
-        <Link
-          href="https://plaza.one/"
-          target="_blank"
-          className="shrink-0 text-foreground/30 text-[0.52rem] uppercase tracking-widest hover:text-foreground/60 transition-colors"
-        >
-          plaza
-        </Link>
       </div>
 
       <style>{`

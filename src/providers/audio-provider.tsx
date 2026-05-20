@@ -1,5 +1,6 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import {
   createContext,
   type ReactNode,
@@ -14,12 +15,16 @@ import {
   AMBIENT_VOLUME,
   NIGHTWAVE_PLAZA_STREAM_URL,
   PLAZA_POSITION_TICK_MS,
-  PLAZA_STATUS_POLL_MS,
   STANDARD_VOLUME,
 } from "@/utils/constants";
 import { fetchPlazaStatus } from "@/utils/plaza-radio";
 
 type Sound = "click" | "warning" | "success" | "start" | "back";
+
+/** Minimum ms between polls — avoids hammering the API on fast songs or errors. */
+const MIN_POLL_MS = 3_000;
+/** Fallback cap when song data is missing. */
+const FALLBACK_POLL_MS = 10_000;
 
 interface AudioContextProps {
   stopAudio: boolean;
@@ -28,6 +33,9 @@ interface AudioContextProps {
   ambientActive: boolean;
   nowPlaying: RadioNowPlaying | null;
   nowPlayingPosition: number;
+  /** Controls only the radio stream — independent of game sound effects. */
+  radioPlaying: boolean;
+  toggleRadio: () => void;
 }
 
 export const AudioContext = createContext<AudioContextProps | undefined>(
@@ -36,10 +44,9 @@ export const AudioContext = createContext<AudioContextProps | undefined>(
 
 export const AudioProvider = ({ children }: { children: ReactNode }) => {
   const [stopAudio, setStopAudio] = useState<boolean>(false);
+  const [radioPlaying, setRadioPlaying] = useState<boolean>(true);
   const [ambientActive, setAmbientActive] = useState(false);
-  const [nowPlaying, setNowPlaying] = useState<RadioNowPlaying | null>(null);
   const [nowPlayingPosition, setNowPlayingPosition] = useState(0);
-  const positionSyncedAtRef = useRef(0);
 
   const audioVolume = stopAudio ? 0 : STANDARD_VOLUME;
 
@@ -58,17 +65,54 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
   const [playSuccess] = useSound(soundFiles.success, { volume: audioVolume });
   const [playBack] = useSound(soundFiles.back, { volume: audioVolume });
 
-  const syncNowPlaying =
-    useCallback(async (): Promise<RadioNowPlaying | null> => {
-      const status = await fetchPlazaStatus();
-      if (!status) return null;
+  // ─── Plaza radio status polling via React Query ───────────────────────────
+  const { data: nowPlaying = null, dataUpdatedAt } = useQuery({
+    queryKey: ["plaza-status"],
+    queryFn: fetchPlazaStatus,
+    enabled: ambientActive,
+    // Dynamic refetch interval: wait until the current song ends (+ 1 s buffer).
+    // Falls back to FALLBACK_POLL_MS when no song data is available.
+    refetchInterval: (query) => {
+      if (!ambientActive) return false;
 
-      positionSyncedAtRef.current = Date.now();
-      setNowPlaying(status);
-      setNowPlayingPosition(status.position);
-      return status;
-    }, []);
+      const song = query.state.data;
+      if (!song) return FALLBACK_POLL_MS;
 
+      const elapsedSinceFetch = (Date.now() - query.state.dataUpdatedAt) / 1000;
+      const timeRemaining = Math.max(
+        0,
+        song.length - song.position - elapsedSinceFetch,
+      );
+
+      // +1 s buffer so the API has time to reflect the new song
+      return Math.max(MIN_POLL_MS, (timeRemaining + 1) * 1000);
+    },
+  });
+
+  // ─── Sync local position counter when fresh data arrives ─────────────────
+  useEffect(() => {
+    if (!nowPlaying) {
+      setNowPlayingPosition(0);
+      return;
+    }
+    setNowPlayingPosition(nowPlaying.position);
+  }, [nowPlaying]);
+
+  // ─── Tick local position every second ────────────────────────────────────
+  useEffect(() => {
+    if (!ambientActive || !nowPlaying || !radioPlaying) return;
+
+    const tickId = window.setInterval(() => {
+      const elapsed = (Date.now() - dataUpdatedAt) / 1000;
+      setNowPlayingPosition(
+        Math.min(nowPlaying.length, nowPlaying.position + elapsed),
+      );
+    }, PLAZA_POSITION_TICK_MS);
+
+    return () => clearInterval(tickId);
+  }, [ambientActive, nowPlaying, radioPlaying, dataUpdatedAt]);
+
+  // ─── HLS stream setup ─────────────────────────────────────────────────────
   useEffect(() => {
     let mounted = true;
     const audio = new Audio();
@@ -103,85 +147,28 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
     };
   }, []);
 
+  // ─── Play / pause radio stream ────────────────────────────────────────────
   useEffect(() => {
     const audio = radioRef.current;
     if (!audio || !ambientActive) return;
 
-    if (stopAudio) {
+    if (!radioPlaying) {
       audio.pause();
       return;
     }
 
     audio.volume = AMBIENT_VOLUME;
     void audio.play();
-  }, [ambientActive, stopAudio]);
-
-  useEffect(() => {
-    if (!ambientActive) {
-      setNowPlaying(null);
-      setNowPlayingPosition(0);
-      return;
-    }
-
-    let cancelled = false;
-    let timeoutId: ReturnType<typeof setTimeout>;
-
-    const doPoll = async (prev: RadioNowPlaying | null) => {
-      if (cancelled) return;
-      const next = await syncNowPlaying();
-      if (cancelled) return;
-
-      // Smart scheduling: fetch just after the current song ends.
-      // Uses the known position + length to calculate remaining time,
-      // clamped between 3 s (minimum) and PLAZA_STATUS_POLL_MS (fallback cap).
-      const status = next ?? prev;
-      let delayMs = PLAZA_STATUS_POLL_MS;
-      if (status) {
-        const clientElapsed = (Date.now() - positionSyncedAtRef.current) / 1000;
-        const timeRemaining = Math.max(
-          0,
-          status.length - status.position - clientElapsed,
-        );
-        // +1 s buffer so the next song has time to appear in the API
-        delayMs = Math.max(
-          3_000,
-          Math.min(PLAZA_STATUS_POLL_MS, (timeRemaining + 1) * 1000),
-        );
-      }
-
-      timeoutId = setTimeout(() => void doPoll(next), delayMs);
-    };
-
-    void doPoll(null);
-
-    return () => {
-      cancelled = true;
-      clearTimeout(timeoutId);
-    };
-  }, [ambientActive, syncNowPlaying]);
-
-  useEffect(() => {
-    if (!ambientActive || !nowPlaying || stopAudio) return;
-
-    const tickId = window.setInterval(() => {
-      const elapsed = (Date.now() - positionSyncedAtRef.current) / 1000;
-      setNowPlayingPosition(
-        Math.min(nowPlaying.length, nowPlaying.position + elapsed),
-      );
-    }, PLAZA_POSITION_TICK_MS);
-
-    return () => clearInterval(tickId);
-  }, [ambientActive, nowPlaying, stopAudio]);
+  }, [ambientActive, radioPlaying]);
 
   const playAmbient = useCallback(() => {
     setAmbientActive(true);
-    const audio = radioRef.current;
-    if (!audio || stopAudio) return;
+    setRadioPlaying(true);
+  }, []);
 
-    audio.volume = AMBIENT_VOLUME;
-    void audio.play();
-    void syncNowPlaying();
-  }, [stopAudio, syncNowPlaying]);
+  const toggleRadio = useCallback(() => {
+    setRadioPlaying((prev) => !prev);
+  }, []);
 
   const playSound = useCallback(
     (sound: Sound) => {
@@ -211,6 +198,8 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
         ambientActive,
         nowPlaying,
         nowPlayingPosition,
+        radioPlaying,
+        toggleRadio,
       }}
     >
       {children}

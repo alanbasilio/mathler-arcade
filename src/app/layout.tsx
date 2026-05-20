@@ -4,6 +4,7 @@ import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 import { AudioProvider } from "@/providers/audio-provider";
 import { GameProvider } from "@/providers/game-provider";
+import { ReactQueryProvider } from "@/providers/query-provider";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 
@@ -29,12 +30,14 @@ export default function RootLayout({
     >
       <body className={`${ps2.className} antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="light">
-          <AudioProvider>
-            <GameProvider>
-              {children}
-              <Toaster />
-            </GameProvider>
-          </AudioProvider>
+          <ReactQueryProvider>
+            <AudioProvider>
+              <GameProvider>
+                {children}
+                <Toaster />
+              </GameProvider>
+            </AudioProvider>
+          </ReactQueryProvider>
         </ThemeProvider>
       </body>
     </html>
