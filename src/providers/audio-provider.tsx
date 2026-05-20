@@ -58,14 +58,16 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
   const [playSuccess] = useSound(soundFiles.success, { volume: audioVolume });
   const [playBack] = useSound(soundFiles.back, { volume: audioVolume });
 
-  const syncNowPlaying = useCallback(async () => {
-    const status = await fetchPlazaStatus();
-    if (!status) return;
+  const syncNowPlaying =
+    useCallback(async (): Promise<RadioNowPlaying | null> => {
+      const status = await fetchPlazaStatus();
+      if (!status) return null;
 
-    positionSyncedAtRef.current = Date.now();
-    setNowPlaying(status);
-    setNowPlayingPosition(status.position);
-  }, []);
+      positionSyncedAtRef.current = Date.now();
+      setNowPlaying(status);
+      setNowPlayingPosition(status.position);
+      return status;
+    }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -121,12 +123,41 @@ export const AudioProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
-    void syncNowPlaying();
-    const pollId = window.setInterval(() => {
-      void syncNowPlaying();
-    }, PLAZA_STATUS_POLL_MS);
+    let cancelled = false;
+    let timeoutId: ReturnType<typeof setTimeout>;
 
-    return () => clearInterval(pollId);
+    const doPoll = async (prev: RadioNowPlaying | null) => {
+      if (cancelled) return;
+      const next = await syncNowPlaying();
+      if (cancelled) return;
+
+      // Smart scheduling: fetch just after the current song ends.
+      // Uses the known position + length to calculate remaining time,
+      // clamped between 3 s (minimum) and PLAZA_STATUS_POLL_MS (fallback cap).
+      const status = next ?? prev;
+      let delayMs = PLAZA_STATUS_POLL_MS;
+      if (status) {
+        const clientElapsed = (Date.now() - positionSyncedAtRef.current) / 1000;
+        const timeRemaining = Math.max(
+          0,
+          status.length - status.position - clientElapsed,
+        );
+        // +1 s buffer so the next song has time to appear in the API
+        delayMs = Math.max(
+          3_000,
+          Math.min(PLAZA_STATUS_POLL_MS, (timeRemaining + 1) * 1000),
+        );
+      }
+
+      timeoutId = setTimeout(() => void doPoll(next), delayMs);
+    };
+
+    void doPoll(null);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timeoutId);
+    };
   }, [ambientActive, syncNowPlaying]);
 
   useEffect(() => {

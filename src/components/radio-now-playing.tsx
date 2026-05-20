@@ -1,62 +1,137 @@
 "use client";
 
+import { Pause, Play } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useAudio } from "@/hooks/use-audio";
 import { formatRadioTime } from "@/utils/plaza-radio";
 
 export const RadioNowPlaying = () => {
-  const { ambientActive, nowPlaying, nowPlayingPosition, stopAudio } =
-    useAudio();
+  const {
+    ambientActive,
+    nowPlaying,
+    nowPlayingPosition,
+    stopAudio,
+    toggleAudio,
+  } = useAudio();
 
   if (!ambientActive || !nowPlaying) return null;
 
-  const progress =
-    nowPlaying.length > 0
-      ? Math.min(100, (nowPlayingPosition / nowPlaying.length) * 100)
-      : 0;
+  const elapsed = nowPlayingPosition;
+  const total = nowPlaying.length;
+  const remaining = Math.max(0, total - elapsed);
+  const progress = total > 0 ? Math.min(100, (elapsed / total) * 100) : 0;
+  const trackLabel = `${nowPlaying.title} — ${nowPlaying.artist}`;
+  const isLong = trackLabel.length > 42;
 
   return (
     <div
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-foreground/10 bg-background/85 backdrop-blur-md"
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-foreground/10 bg-background/92 backdrop-blur-md"
       data-cy="radio-now-playing"
     >
-      <div className="h-0.5 bg-foreground/10" aria-hidden>
+      {/* Progress bar */}
+      <div className="h-px bg-foreground/8" aria-hidden>
         <div
-          className="h-full bg-foreground/45 transition-[width] duration-1000 ease-linear"
+          className="h-full bg-foreground/40 transition-[width] duration-1000 ease-linear"
           style={{ width: `${progress}%` }}
         />
       </div>
-      <div className="mx-auto flex h-9 max-w-3xl items-center gap-2.5 px-3">
+
+      {/* Player row */}
+      <div className="mx-auto flex h-10 max-w-3xl items-center gap-2.5 px-3">
+        {/* Play / Pause */}
+        <button
+          type="button"
+          onClick={toggleAudio}
+          aria-label={stopAudio ? "Play" : "Pause"}
+          className="shrink-0 flex items-center justify-center text-foreground/50 hover:text-foreground/90 transition-colors"
+        >
+          {stopAudio ? (
+            <Play className="size-3 fill-current" />
+          ) : (
+            <Pause className="size-3 fill-current" />
+          )}
+        </button>
+
+        {/* Artwork */}
         {nowPlaying.artworkUrl ? (
           <Image
             src={nowPlaying.artworkUrl}
             alt=""
-            width={24}
-            height={24}
+            width={22}
+            height={22}
             unoptimized
-            className="size-6 shrink-0 object-cover opacity-90"
+            className="size-[22px] shrink-0 object-cover opacity-75"
           />
         ) : (
-          <div className="size-6 shrink-0 bg-foreground/10" />
+          <div className="size-[22px] shrink-0 bg-foreground/10" />
         )}
-        <p className="min-w-0 flex-1 truncate text-foreground/80 text-[0.65rem] leading-none tracking-tight">
-          <span className="text-foreground">{nowPlaying.title}</span>
-          <span className="text-foreground/40"> — </span>
-          <span>{nowPlaying.artist}</span>
-        </p>
-        <span className="shrink-0 text-foreground/45 text-[0.6rem] tabular-nums">
-          {formatRadioTime(nowPlayingPosition)}
-          {stopAudio ? " · off" : ""}
-        </span>
+
+        {/* Track info — scrolls when long */}
+        <div className="min-w-0 flex-1 overflow-hidden">
+          {isLong ? (
+            <div className="overflow-hidden">
+              <span className="radio-marquee inline-flex gap-12 whitespace-nowrap text-[0.62rem] leading-none tracking-tight">
+                <span>
+                  <span className="text-foreground/90">{nowPlaying.title}</span>
+                  <span className="text-foreground/35"> — </span>
+                  <span className="text-foreground/55">
+                    {nowPlaying.artist}
+                  </span>
+                </span>
+                {/* Duplicate for seamless loop */}
+                <span aria-hidden>
+                  <span className="text-foreground/90">{nowPlaying.title}</span>
+                  <span className="text-foreground/35"> — </span>
+                  <span className="text-foreground/55">
+                    {nowPlaying.artist}
+                  </span>
+                </span>
+              </span>
+            </div>
+          ) : (
+            <p className="truncate text-[0.62rem] leading-none tracking-tight">
+              <span className="text-foreground/90">{nowPlaying.title}</span>
+              <span className="text-foreground/35"> — </span>
+              <span className="text-foreground/55">{nowPlaying.artist}</span>
+            </p>
+          )}
+        </div>
+
+        {/* Time display: elapsed · total · −remaining */}
+        <div className="shrink-0 flex items-center gap-1 font-mono tabular-nums select-none">
+          <span className="text-foreground/70 text-[0.6rem]">
+            {formatRadioTime(elapsed)}
+          </span>
+          <span className="text-foreground/20 text-[0.5rem]">/</span>
+          <span className="text-foreground/40 text-[0.6rem]">
+            {formatRadioTime(total)}
+          </span>
+          <span className="text-foreground/15 text-[0.5rem] mx-0.5">·</span>
+          <span className="text-foreground/30 text-[0.6rem]">
+            -{formatRadioTime(remaining)}
+          </span>
+        </div>
+
+        {/* Plaza attribution */}
         <Link
           href="https://plaza.one/"
           target="_blank"
-          className="shrink-0 text-foreground/35 text-[0.55rem] uppercase tracking-widest hover:text-foreground/60"
+          className="shrink-0 text-foreground/30 text-[0.52rem] uppercase tracking-widest hover:text-foreground/60 transition-colors"
         >
           plaza
         </Link>
       </div>
+
+      <style>{`
+        @keyframes radio-marquee {
+          0%   { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .radio-marquee {
+          animation: radio-marquee 14s linear infinite;
+        }
+      `}</style>
     </div>
   );
 };
