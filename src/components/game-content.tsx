@@ -15,7 +15,7 @@ import { Button } from "./ui/button";
 
 export const GameContent = () => {
   const { theme, setTheme } = useTheme();
-  const { gameWon, targetResult } = useGame();
+  const { gameWon, targetResult, targetEquation, revealEquation } = useGame();
   const { stopAudio, toggleAudio, playSound } = useAudio();
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
@@ -58,7 +58,17 @@ export const GameContent = () => {
           className="text-foreground text-xs lg:text-base leading-none tracking-tighter"
           data-cy="subtitle"
         >
-          {isDesktop ? (
+          {revealEquation ? (
+            <>
+              The answer is{" "}
+              <span
+                className="bg-foreground text-background p-1"
+                data-cy="revealed-equation"
+              >
+                {targetEquation} = {targetResult}
+              </span>
+            </>
+          ) : isDesktop ? (
             <>
               Solve the hidden equation{" "}
               <span className="bg-foreground text-background p-1">

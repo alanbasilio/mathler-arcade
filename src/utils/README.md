@@ -32,7 +32,8 @@ All magic values in one place:
 - `isDuplicateGuess(guess, previousGuesses)` — checks guess against submitted history
 
 ### `numbers.ts`
-- `getNumberOfTheDay()` — returns the daily equation string from the `answers` array.
-  - Index = `floor((today - GAME_START_DATE) / MS_PER_DAY) % answers.length`
-  - Override via URL: `?date=DDMMYYYY`
-- `answers` — array of 100 pre-computed 6-character equations (e.g. `"55+5*2"` → 65)
+- `getNumberOfTheDay()` — returns the daily equation for today (or `?date=YYYYMMDD` / ISO).
+- `generateEquationForDay(dayIndex)` — deterministic `N1 op1 N2 op2 N3` equation (random ops/digits, validated by `evaluate`).
+- `getDayIndex(referenceDate)` — day offset from `GAME_START_DATE`.
+- `parseDateParam(dateParam)` — parses `YYYYMMDD` or ISO via moment (strict).
+- `formatDateParam(date)` — formats a date as `YYYYMMDD` for the query param.

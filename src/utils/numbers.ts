@@ -1,142 +1,116 @@
-import { GAME_START_DATE, MS_PER_DAY } from "./constants";
+import moment, { type Moment } from "moment";
+import { EQUATION_LENGTH, GAME_START_DATE } from "./constants";
+import { evaluate } from "./evaluate";
 
-const isValidDate = (date: Date): boolean =>
-  date instanceof Date && !Number.isNaN(date.getTime());
+const OPERATORS = ["+", "-", "*", "/"] as const;
 
-const parseDateParam = (dateParam: string): Date | null => {
-  const day = parseInt(dateParam.slice(0, 2), 10);
-  const month = parseInt(dateParam.slice(2, 4), 10) - 1; // Months are 0-indexed
-  const year = parseInt(dateParam.slice(4), 10);
+/** Digit lengths for the three numbers in `N1 op1 N2 op2 N3` (must sum to 4). */
+const DIGIT_LENGTH_PATTERNS: readonly [number, number, number][] = [
+  [2, 1, 1],
+  [1, 2, 1],
+  [1, 1, 2],
+];
 
-  if (Number.isNaN(day) || Number.isNaN(month) || Number.isNaN(year))
-    return null;
+const DATE_PARAM_FORMAT_COMPACT = "YYYYMMDD";
+const GAME_START_MOMENT = moment(GAME_START_DATE).startOf("day");
 
-  const parsed = new Date(year, month, day);
-  const isExactDate =
-    parsed.getDate() === day &&
-    parsed.getMonth() === month &&
-    parsed.getFullYear() === year;
+const toStartOfDay = (value: Moment | Date): Moment =>
+  moment(value).startOf("day");
 
-  return isValidDate(parsed) && isExactDate ? parsed : null;
+/** Formats a date for the `?date=` query param (`YYYYMMDD`). */
+export const formatDateParam = (date: Date): string =>
+  moment(date).format(DATE_PARAM_FORMAT_COMPACT);
+
+/** Parses `?date=` as `YYYYMMDD` or ISO (`YYYY-MM-DD` / full ISO datetime). */
+export const parseDateParam = (dateParam: string): Date | null => {
+  const trimmed = dateParam.trim();
+  if (!trimmed) return null;
+
+  const compact = moment(trimmed, DATE_PARAM_FORMAT_COMPACT, true);
+  if (compact.isValid()) return toStartOfDay(compact).toDate();
+
+  const iso = moment(trimmed, moment.ISO_8601, true);
+  if (iso.isValid()) return toStartOfDay(iso).toDate();
+
+  return null;
 };
 
-export function getNumberOfTheDay() {
+export function getReferenceDate(): Date {
   const searchParams =
     typeof window !== "undefined"
       ? new URLSearchParams(window.location.search)
       : new URLSearchParams();
 
   const dateParam = searchParams.get("date");
-  let referenceDate = new Date();
-
   if (dateParam) {
     const parsed = parseDateParam(dateParam);
-    if (parsed) referenceDate = parsed;
+    if (parsed) return parsed;
   }
 
-  const diff = Number(referenceDate) - Number(GAME_START_DATE);
-  const day = Math.floor(diff / MS_PER_DAY) % answers.length;
-
-  return answers[day];
+  return moment().startOf("day").toDate();
 }
 
-export const answers = [
-  "55+5*2", // 65
-  "99-9/3", // 96
-  "12*4+3", // 51
-  "72/8+1", // 10
-  "7*7+14", // 63
-  "90-6*5", // 60
-  "2+4*22", // 90
-  "81/9+6", // 15
-  "15+3*8", // 39
-  "64/8*3", // 24
-  "11+4*7", // 39
-  "95-7*5", // 60
-  "3*9+36", // 63
-  "48/6+7", // 15
-  "13+2*9", // 31
-  "80-7*3", // 59
-  "5*5+24", // 49
-  "72/9+1", // 9
-  "18+3*7", // 39
-  "60/5*4", // 48
-  "9+5*11", // 64
-  "88-4*7", // 60
-  "4*7+30", // 58
-  "54/6+5", // 14
-  "16+2*8", // 32
-  "75-5*3", // 60
-  "6*6+21", // 57
-  "63/9+4", // 11
-  "22+3*6", // 40
-  "56/7*6", // 48
-  "8+4*13", // 60
-  "92-6*5", // 62
-  "3*8+42", // 66
-  "45/5+8", // 17
-  "19+2*7", // 33
-  "70-4*5", // 50
-  "5*7+20", // 55
-  "81/9+2", // 11
-  "25+3*5", // 40
-  "48/6*7", // 56
-  "7+6*11", // 73
-  "96-8*3", // 72
-  "4*9+27", // 63
-  "36/4+6", // 15
-  "14+3*9", // 41
-  "85-5*7", // 50
-  "6*5+33", // 63
-  "72/8+3", // 12
-  "28+2*6", // 40
-  "54/6*8", // 72
-  "9+7*10", // 79
-  "98-7*4", // 70
-  "3*11+4", // 37
-  "63/7+5", // 14
-  "17+2*9", // 35
-  "75-3*8", // 51
-  "5*8+19", // 59
-  "90/9+1", // 11
-  "31+3*4", // 43
-  "42/6*9", // 63
-  "6+5*13", // 71
-  "94-6*6", // 58
-  "4*8+35", // 67
-  "27/3+7", // 16
-  "20+3*7", // 41
-  "80-4*7", // 52
-  "7*7+12", // 61
-  "54/6+4", // 13
-  "34+2*5", // 44
-  "48/8*9", // 54
-  "8+6*12", // 80
-  "97-7*5", // 62
-  "3*10+7", // 37
-  "72/8+2", // 11
-  "23+3*6", // 41
-  "65-5*3", // 50
-  "6*6+25", // 61
-  "81/9+3", // 12
-  "37+2*4", // 45
-  "36/4*9", // 81
-  "5+7*11", // 82
-  "93-6*7", // 51
-  "4*9+31", // 67
-  "45/5+6", // 15
-  "26+3*5", // 41
-  "70-3*7", // 49
-  "8*5+17", // 57
-  "63/7+4", // 13
-  "40+2*3", // 46
-  "30/5*9", // 54
-  "7+6*13", // 85
-  "95-8*4", // 63
-  "3*9+39", // 66
-  "54/6+5", // 14
-  "29+2*7", // 43
-  "60-4*3", // 48
-  "5*7+22", // 57
-  "72/8+3", // 12
-];
+export function getDayIndex(referenceDate: Date = getReferenceDate()): number {
+  return toStartOfDay(referenceDate).diff(GAME_START_MOMENT, "days");
+}
+
+const createRng = (seed: number): (() => number) => {
+  let state = seed >>> 0;
+  return () => {
+    state = (Math.imul(1664525, state) + 1013904223) >>> 0;
+    return state / 0x100000000;
+  };
+};
+
+const pick = <T>(rng: () => number, items: readonly T[]): T => {
+  const index = Math.floor(rng() * items.length);
+  return items[index] ?? items[0];
+};
+
+const randomDigits = (rng: () => number, length: number): string => {
+  if (length === 1) return String(Math.floor(rng() * 10));
+  const value = 10 + Math.floor(rng() * 90);
+  return String(value);
+};
+
+const isValidEquation = (equation: string): boolean => {
+  if (equation.length !== EQUATION_LENGTH) return false;
+  if (!/[+\-*/]/.test(equation)) return false;
+
+  const result = evaluate(equation);
+  return result !== null && Number.isInteger(result) && result > 0;
+};
+
+/** Builds `N1 op1 N2 op2 N3` with random operators and digit groups (always 6 chars). */
+const buildRandomEquation = (rng: () => number): string => {
+  const [len1, len2, len3] = pick(rng, DIGIT_LENGTH_PATTERNS);
+  const op1 = pick(rng, OPERATORS);
+  const op2 = pick(rng, OPERATORS);
+  return `${randomDigits(rng, len1)}${op1}${randomDigits(rng, len2)}${op2}${randomDigits(rng, len3)}`;
+};
+
+export function generateEquationForDay(dayIndex: number): string {
+  const maxAttempts = 64;
+
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const rng = createRng(dayIndex + attempt * 9973);
+    const equation = buildRandomEquation(rng);
+    if (isValidEquation(equation)) return equation;
+  }
+
+  return "12*4+3";
+}
+
+export function getNumberOfTheDayForDate(referenceDate: Date): string {
+  return generateEquationForDay(getDayIndex(referenceDate));
+}
+
+export function getNumberOfTheDayForDateParam(dateParam: string): string {
+  const parsed = parseDateParam(dateParam);
+  if (!parsed) return getNumberOfTheDay();
+  return getNumberOfTheDayForDate(parsed);
+}
+
+export function getNumberOfTheDay(): string {
+  return getNumberOfTheDayForDate(getReferenceDate());
+}

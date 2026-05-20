@@ -47,6 +47,7 @@ interface GameContextProps {
   targetResult: number;
   targetEquation: string;
   activeKey: string;
+  revealEquation: boolean;
 }
 
 export const GameContext = createContext<GameContextProps | undefined>(
@@ -118,6 +119,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     Record<string, FeedbackColor>
   >({});
   const [activeKey, setActiveKey] = useState<string>("");
+  const [revealEquation, setRevealEquation] = useState(false);
   const { playSound } = useAudio();
 
   // Computed once on mount — avoids module-level side effects that run at
@@ -208,6 +210,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     setGameWon(false);
     setKeyboardFeedback({});
     setActiveKey("");
+    setRevealEquation(false);
   }, []);
 
   const handleKeyPress = useCallback(
@@ -252,6 +255,32 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyPress]);
 
+  useEffect(() => {
+    const canReveal = gameStarted && !gameOver && !gameWon;
+
+    const handleRevealDown = (event: KeyboardEvent) => {
+      if (event.key.toLowerCase() !== "e" || !canReveal) return;
+      event.preventDefault();
+      setRevealEquation(true);
+    };
+
+    const handleRevealUp = (event: KeyboardEvent) => {
+      if (event.key.toLowerCase() !== "e") return;
+      setRevealEquation(false);
+    };
+
+    const handleBlur = () => setRevealEquation(false);
+
+    window.addEventListener("keydown", handleRevealDown);
+    window.addEventListener("keyup", handleRevealUp);
+    window.addEventListener("blur", handleBlur);
+    return () => {
+      window.removeEventListener("keydown", handleRevealDown);
+      window.removeEventListener("keyup", handleRevealUp);
+      window.removeEventListener("blur", handleBlur);
+    };
+  }, [gameStarted, gameOver, gameWon]);
+
   return (
     <GameContext.Provider
       value={{
@@ -269,6 +298,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
         targetResult,
         targetEquation,
         activeKey,
+        revealEquation,
       }}
     >
       {children}

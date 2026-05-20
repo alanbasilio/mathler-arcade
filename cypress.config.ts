@@ -1,8 +1,15 @@
 import { defineConfig } from "cypress";
+import { getNumberOfTheDayForDateParam } from "./src/utils/numbers";
 
 export default defineConfig({
   e2e: {
-    setupNodeEvents(_on, _config) {},
+    setupNodeEvents(on) {
+      on("task", {
+        getEquationForDate(dateParam: string) {
+          return getNumberOfTheDayForDateParam(dateParam);
+        },
+      });
+    },
   },
 
   component: {

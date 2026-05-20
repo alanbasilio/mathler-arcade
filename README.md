@@ -57,7 +57,7 @@ Daily math puzzle game in the style of Wordle. Players guess a hidden 6-characte
 
 ## Override Daily Puzzle
 
-Add `?date=DDMMYYYY` to the URL to load a specific day's puzzle.
+Add `?date=YYYYMMDD` or `?date=YYYY-MM-DD` (ISO) to the URL to load a specific day's puzzle.
 
 ## Project Structure
 
