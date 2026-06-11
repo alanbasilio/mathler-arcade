@@ -1,7 +1,6 @@
 "use client";
 
 import { Info } from "lucide-react";
-import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,9 +24,9 @@ export const Tutorial = () => {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Link href="#" className="hover:text-foreground">
-          <Info className="lg:absolute lg:left-5 lg:top-5" />
-        </Link>
+        <Button variant="ghost" size="icon" aria-label="How to play">
+          <Info />
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

@@ -31,14 +31,14 @@ export const Lobby = ({ sessionId }: LobbyProps) => {
   if (session?.status === "waiting" && !isJoining) {
     return (
       <div className="flex flex-col gap-6 items-center">
-        <h1 className="text-foreground text-4xl md:text-5xl italic leading-none tracking-tighter animate-pulse">
+        <h1 className="text-foreground font-heading neon-glow text-3xl md:text-4xl leading-none animate-pulse">
           Mathler Duo
         </h1>
-        <p className="text-foreground text-sm text-center">
+        <p className="text-foreground text-base text-center">
           Waiting for opponent…
         </p>
         <div className="flex flex-col gap-2 items-center w-full max-w-sm">
-          <p className="text-foreground text-xs">
+          <p className="text-foreground text-sm">
             Share this link with a friend:
           </p>
           <div className="flex gap-2 items-center w-full">
@@ -60,10 +60,10 @@ export const Lobby = ({ sessionId }: LobbyProps) => {
 
   return (
     <div className="flex flex-col gap-6 items-center">
-      <h1 className="text-foreground text-4xl md:text-5xl italic leading-none tracking-tighter animate-pulse">
+      <h1 className="text-foreground font-heading neon-glow text-3xl md:text-4xl leading-none">
         {isJoining ? "Join Game" : "Mathler Duo"}
       </h1>
-      <p className="text-foreground text-sm text-center">
+      <p className="text-foreground text-base text-center">
         {isJoining
           ? "Enter your name to join the game"
           : "Start a new multiplayer session"}
@@ -74,7 +74,7 @@ export const Lobby = ({ sessionId }: LobbyProps) => {
         value={name}
         onChange={(e) => setName(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-        className="border-4 border-foreground px-3 py-2 bg-background text-foreground w-48 font-mono focus:outline-none"
+        className="border-4 border-foreground px-3 py-2 bg-background text-foreground w-48 font-mono focus:outline-none focus:border-neon-cyan"
         maxLength={20}
       />
       <Button

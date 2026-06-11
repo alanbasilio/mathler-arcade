@@ -20,7 +20,9 @@ const buttonVariants = cva(
           "bg-destructive text-destructive-foreground hover:bg-destructive/80 aria-expanded:bg-destructive aria-expanded:text-destructive-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         pixel:
-          "bg-primary text-primary-foreground rounded-none border-4 border-foreground shadow-[4px_4px_0px_var(--color-foreground)] active:shadow-none active:translate-x-1 active:translate-y-1",
+          "font-heading bg-primary text-primary-foreground rounded-none border-4 border-foreground shadow-[4px_4px_0px_var(--color-foreground)] hover:shadow-[4px_4px_0px_var(--color-neon-magenta)] focus-visible:shadow-[4px_4px_0px_var(--color-neon-magenta)] active:shadow-none active:translate-x-1 active:translate-y-1",
+        "pixel-key":
+          "font-heading text-xs bg-secondary text-secondary-foreground rounded-none border-2 border-foreground shadow-[2px_2px_0px_var(--color-foreground)] active:shadow-none active:translate-x-0.5 active:translate-y-0.5",
         warning:
           "bg-warning text-warning-foreground hover:bg-warning/80 aria-expanded:bg-warning aria-expanded:text-warning-foreground",
         success:

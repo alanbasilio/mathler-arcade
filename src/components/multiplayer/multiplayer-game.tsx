@@ -30,7 +30,7 @@ const MultiplayerTile = ({
   return (
     <div
       className={cn(
-        "text-foreground w-10 md:w-12 aspect-square flex items-center justify-center text-base md:text-lg font-bold border-foreground border-4 shadow-lg transition-colors duration-300",
+        "text-foreground font-heading w-10 md:w-12 aspect-square flex items-center justify-center text-base md:text-lg border-foreground border-4 shadow-[3px_3px_0px_color-mix(in_oklch,var(--color-foreground)_30%,transparent)] transition-colors duration-300",
         {
           "bg-success text-success-foreground": feedbackColor === "success",
           "bg-warning text-warning-foreground": feedbackColor === "warning",
@@ -53,7 +53,7 @@ const PlayerBar = () => {
   const opponent = session.players.find((p) => p.id !== myPlayer?.id);
 
   return (
-    <div className="flex items-center gap-3 text-[10px] font-bold tracking-wide">
+    <div className="flex items-center gap-3 text-xs font-bold tracking-wide">
       <span
         className={cn(
           "text-success transition-opacity",
@@ -63,7 +63,7 @@ const PlayerBar = () => {
         {isMyTurn && "▶ "}
         {me?.name}
       </span>
-      <span className="text-foreground/30 text-[8px]">VS</span>
+      <span className="text-foreground/40 text-[10px]">VS</span>
       <span
         className={cn(
           "text-warning transition-opacity",
@@ -87,7 +87,7 @@ const MultiplayerBoard = () => {
 
   return (
     <div
-      className="grid grid-rows-6 gap-2 bg-background/20 backdrop-blur-sm border-4 border-foreground p-2"
+      className="grid grid-rows-6 gap-2 bg-background/20 backdrop-blur-sm border-4 border-foreground p-2 shadow-[0_0_28px_color-mix(in_oklch,var(--color-neon-cyan)_22%,transparent)]"
       data-cy="grid"
     >
       {Array.from({ length: ROWS }, (_, rowIndex) => {
@@ -113,11 +113,11 @@ const MultiplayerBoard = () => {
                   isMe ? "text-success" : "text-warning",
                 )}
               >
-                <span className="text-[8px] font-bold uppercase tracking-[0.2em] whitespace-nowrap max-w-[72px] truncate opacity-60">
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] whitespace-nowrap max-w-[72px] truncate opacity-60">
                   {guess.playerName}
                 </span>
                 <span className="mx-1.5 h-px w-4 shrink-0 bg-current opacity-30" />
-                <span className="text-[8px] opacity-50">▶</span>
+                <span className="text-[10px] opacity-50">▶</span>
               </div>
             )}
             {isCurrentRow && session?.status === "playing" && (
@@ -128,11 +128,11 @@ const MultiplayerBoard = () => {
                   isMyTurn ? "text-success" : "text-warning",
                 )}
               >
-                <span className="text-[8px] font-bold uppercase tracking-[0.2em] whitespace-nowrap">
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] whitespace-nowrap">
                   {isMyTurn ? "you" : (currentPlayer?.name ?? "").slice(0, 9)}
                 </span>
                 <span className="mx-1.5 h-px w-4 shrink-0 bg-current" />
-                <span className="text-[8px]">▶</span>
+                <span className="text-[10px]">▶</span>
               </div>
             )}
 
@@ -161,7 +161,7 @@ const MultiplayerBoard = () => {
             {isFilled && (
               <span
                 className={cn(
-                  "md:hidden ml-1 px-1 py-0.5 text-[7px] font-bold uppercase tracking-wide whitespace-nowrap max-w-[36px] truncate border",
+                  "md:hidden ml-1 px-1 py-0.5 text-[9px] font-bold uppercase tracking-wide whitespace-nowrap max-w-[36px] truncate border",
                   isMe
                     ? "border-success/40 text-success/70"
                     : "border-warning/40 text-warning/70",
@@ -173,7 +173,7 @@ const MultiplayerBoard = () => {
             {isCurrentRow && session?.status === "playing" && (
               <span
                 className={cn(
-                  "md:hidden ml-1 px-1 py-0.5 text-[7px] font-bold uppercase tracking-wide whitespace-nowrap border animate-pulse",
+                  "md:hidden ml-1 px-1 py-0.5 text-[9px] font-bold uppercase tracking-wide whitespace-nowrap border animate-pulse",
                   isMyTurn
                     ? "border-success bg-success/10 text-success"
                     : "border-warning bg-warning/10 text-warning",
@@ -194,24 +194,30 @@ const MultiplayerKeyboard = () => {
     useMultiplayer();
   const highlightEnter = isMyTurn && currentGuess.length === EQUATION_LENGTH;
 
-  const renderKey = (key: string) => (
-    <Button
-      key={key}
-      onClick={() => handleKeyPress(key)}
-      // Prevent the button from receiving focus on mouse click so that
-      // subsequent Enter key presses don't re-trigger the button click.
-      onMouseDown={(e) => e.preventDefault()}
-      variant={getFeedbackColor(keyboardFeedback[key])}
-      disabled={!isMyTurn}
-      className={cn("min-h-10 min-w-10 transition-opacity", {
-        "animate-pulse": highlightEnter && key === "Enter",
-        "opacity-30": !isMyTurn,
-      })}
-      data-cy={`key-${key}`}
-    >
-      {key === "Backspace" ? "Del" : key}
-    </Button>
-  );
+  const renderKey = (key: string) => {
+    const feedback = getFeedbackColor(keyboardFeedback[key]);
+    return (
+      <Button
+        key={key}
+        onClick={() => handleKeyPress(key)}
+        // Prevent the button from receiving focus on mouse click so that
+        // subsequent Enter key presses don't re-trigger the button click.
+        onMouseDown={(e) => e.preventDefault()}
+        variant={feedback === "default" ? "pixel-key" : feedback}
+        disabled={!isMyTurn}
+        className={cn(
+          "min-h-10 min-w-10 font-heading text-xs rounded-none border-2 border-foreground shadow-[2px_2px_0px_var(--color-foreground)] active:shadow-none active:translate-x-0.5 active:translate-y-0.5 transition-opacity",
+          {
+            "animate-blink-border": highlightEnter && key === "Enter",
+            "opacity-30": !isMyTurn,
+          },
+        )}
+        data-cy={`key-${key}`}
+      >
+        {key === "Backspace" ? "Del" : key}
+      </Button>
+    );
+  };
 
   return (
     <div className="flex flex-col gap-2 items-center">
@@ -244,10 +250,10 @@ const GameOverBanner = () => {
           won ? "text-success" : "text-destructive",
         )}
       >
-        <p className="text-2xl md:text-3xl font-bold tracking-tight italic leading-none">
+        <p className="font-heading text-xl md:text-2xl leading-none">
           {won ? "You Win!" : "Game Over"}
         </p>
-        <p className="text-xs md:text-sm font-bold opacity-80 max-w-[200px] leading-snug">
+        <p className="text-sm md:text-base font-bold opacity-80 max-w-[200px] leading-snug">
           {abandoned
             ? "Opponent disconnected."
             : won
@@ -277,13 +283,13 @@ export const MultiplayerGame = () => {
   return (
     <div className="flex flex-col gap-4 p-4 z-10 items-center pb-20 md:pb-4">
       <div className="text-center space-y-2">
-        <h1 className="text-foreground text-3xl md:text-4xl lg:text-5xl italic leading-none tracking-tighter">
+        <h1 className="text-foreground font-heading neon-glow text-2xl md:text-3xl lg:text-4xl leading-none">
           Mathler Duo
         </h1>
         {session?.status === "playing" && (
           <div className="flex flex-col gap-2 items-center">
             <PlayerBar />
-            <h2 className="text-foreground text-xs lg:text-sm leading-none tracking-tighter">
+            <h2 className="text-foreground text-sm lg:text-base leading-none">
               {isDesktop ? (
                 <>
                   Solve the hidden equation{" "}

@@ -36,32 +36,34 @@ export const GameContent = () => {
       )}
     >
       <div className="text-center space-y-2">
-        <div className="flex gap-4 items-center justify-center">
+        <div className="flex gap-2 items-center justify-center">
           <Tutorial />
-          <Link
-            href="#"
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={handleThemeToggle}
-            className="hover:text-foreground"
+            aria-label="Toggle theme"
           >
-            <ThemeToggleIcon className="lg:absolute lg:right-5 lg:bottom-14" />
-          </Link>
+            <ThemeToggleIcon />
+          </Button>
           <h1
-            className="text-foreground text-3xl md:text-4xl lg:text-5xl xl:text-6xl italic leading-none tracking-tighter"
+            className="text-foreground font-heading neon-glow px-2 text-2xl md:text-3xl lg:text-4xl xl:text-5xl leading-none"
             data-cy="title"
           >
             Mathler
           </h1>
-          <Settings />
-          <Link
-            href="#"
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={toggleAudio}
-            className="hover:text-foreground"
+            aria-label={stopAudio ? "Unmute audio" : "Mute audio"}
           >
-            <AudioIcon className="lg:absolute lg:left-5 lg:bottom-14" />
-          </Link>
+            <AudioIcon />
+          </Button>
+          <Settings />
         </div>
         <h2
-          className="text-foreground text-xs lg:text-base leading-none tracking-tighter"
+          className="text-foreground text-sm lg:text-lg leading-none"
           data-cy="subtitle"
         >
           {revealEquation ? (
@@ -95,7 +97,7 @@ export const GameContent = () => {
       <Keyboard />
       {gameWon && (
         <div
-          className="mt-2 px-4 py-3 border-4 border-success bg-success/10 text-success font-bold text-center text-xs md:text-sm animate-pop"
+          className="mt-2 px-4 py-3 border-4 border-success bg-success/10 text-success font-bold text-center text-sm md:text-base animate-pop"
           data-cy="success-message"
         >
           You&apos;ve solved today&apos;s equation! <br />

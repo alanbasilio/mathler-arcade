@@ -46,7 +46,7 @@ const GameBoardTile = ({
   return (
     <div
       className={cn(
-        "text-foreground w-10 md:w-12 aspect-square flex items-center justify-center text-base md:text-lg lg:text-xl xl:text-2xl font-bold border-foreground border-4 shadow-lg transition-colors duration-300",
+        "text-foreground font-heading w-10 md:w-12 aspect-square flex items-center justify-center text-base md:text-lg lg:text-xl xl:text-2xl border-foreground border-4 shadow-[3px_3px_0px_color-mix(in_oklch,var(--color-foreground)_30%,transparent)] transition-colors duration-300",
         mode === "normal" && {
           "bg-success text-success-foreground": feedbackColor === "success",
           "bg-warning text-warning-foreground": feedbackColor === "warning",
@@ -148,7 +148,7 @@ export const GameBoard = () => {
 
   return (
     <div
-      className="grid grid-rows-6 gap-2 bg-background/20 backdrop-blur-sm border-4 border-foreground p-2"
+      className="grid grid-rows-6 gap-2 bg-background/20 backdrop-blur-sm border-4 border-foreground p-2 shadow-[0_0_28px_color-mix(in_oklch,var(--color-neon-cyan)_22%,transparent)]"
       data-cy="grid"
     >
       {Array.from({ length: ROWS }, (_, rowIndex) => (

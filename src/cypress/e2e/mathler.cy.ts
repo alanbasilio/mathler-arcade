@@ -59,13 +59,17 @@ describe("Mathler Game", () => {
     cy.visit(`http://localhost:3000?date=${DATE_3}`);
     cy.get("[data-cy=start]").click();
     submitEquation(INVALID_EQUATION_1);
-    cy.get("[data-cy=destructive-message]").should("be.visible");
+    cy.get("[data-sonner-toast]")
+      .should("be.visible")
+      .and("contain.text", "Try a valid equation!");
   });
 
   it("5 - should not allow submitting an equation with negative numbers", () => {
     cy.visit(`http://localhost:3000?date=${DATE_4}`);
     cy.get("[data-cy=start]").click();
     submitEquation(INVALID_EQUATION_2);
-    cy.get("[data-cy=warning-message]").should("be.visible");
+    cy.get("[data-sonner-toast]")
+      .should("be.visible")
+      .and("contain.text", "Every guess must result in");
   });
 });

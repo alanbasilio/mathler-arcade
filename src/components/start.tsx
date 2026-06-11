@@ -1,5 +1,6 @@
 "use client";
 
+import { motion, useReducedMotion, type Variants } from "framer-motion";
 import moment from "moment";
 import { Button } from "@/components/ui/button";
 import { useGame } from "@/hooks/use-game";
@@ -8,33 +9,59 @@ interface StartProps {
   onPlayDuo: () => void;
 }
 
+const container: Variants = {
+  hidden: {},
+  show: {
+    transition: { staggerChildren: 0.08, delayChildren: 0.05 },
+  },
+};
+
+const item: Variants = {
+  hidden: { opacity: 0, y: 12 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.35, ease: "easeOut" } },
+};
+
 export const Start = ({ onPlayDuo }: StartProps) => {
-  const { startGame, targetResult } = useGame();
+  const { startGame } = useGame();
+  const reduceMotion = useReducedMotion();
 
   return (
-    <div className="flex flex-col gap-6 items-center">
+    <motion.div
+      variants={container}
+      initial={reduceMotion ? "show" : "hidden"}
+      animate="show"
+      className="flex flex-col gap-6 items-center"
+    >
       {/* Arcade header bar */}
-      <p className="text-foreground text-[0.45rem] md:text-[0.55rem] tracking-[0.3em] select-none">
+      <motion.p
+        variants={item}
+        className="text-foreground font-heading text-[0.5rem] md:text-[0.65rem] tracking-[0.3em] select-none"
+      >
         ░░░ ARCADE ░░░
-      </p>
+      </motion.p>
 
-      {/* Title with periodic glitch */}
-      <h1
-        className="text-foreground text-4xl md:text-5xl lg:text-6xl xl:text-7xl italic leading-none tracking-tighter animate-glitch"
+      {/* Title with neon glow + periodic glitch */}
+      <motion.h1
+        variants={item}
+        className="text-foreground font-heading neon-glow text-4xl md:text-5xl lg:text-6xl xl:text-7xl leading-none animate-glitch"
         data-cy="title"
       >
         Mathler
-      </h1>
+      </motion.h1>
 
-      <p
-        className="text-foreground text-[0.55rem] md:text-xs text-center"
+      <motion.p
+        variants={item}
+        className="text-foreground text-base md:text-lg text-center"
         data-cy="subtitle"
       >
         Ready to crunch some numbers?
-      </p>
+      </motion.p>
 
       {/* Action buttons */}
-      <div className="flex max-md:flex-col gap-3 items-center mt-1">
+      <motion.div
+        variants={item}
+        className="flex max-md:flex-col gap-3 items-center mt-1"
+      >
         <Button
           onClick={startGame}
           variant="pixel"
@@ -53,12 +80,15 @@ export const Start = ({ onPlayDuo }: StartProps) => {
         >
           PLAY DUO
         </Button>
-      </div>
+      </motion.div>
 
       {/* Footer credits */}
-      <p className="text-foreground text-[0.4rem] tracking-[0.2em] select-none mt-2">
+      <motion.p
+        variants={item}
+        className="text-foreground text-xs tracking-[0.2em] select-none mt-2"
+      >
         © {moment().year()} · Alan Basilio
-      </p>
-    </div>
+      </motion.p>
+    </motion.div>
   );
 };

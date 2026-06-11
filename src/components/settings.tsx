@@ -1,7 +1,6 @@
 "use client";
 
 import { SettingsIcon } from "lucide-react";
-import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -35,12 +34,14 @@ export const Settings = () => {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Link href="#" className="hover:text-foreground">
-          <SettingsIcon
-            data-cy="settings-icon"
-            className="lg:absolute lg:right-5 lg:top-5"
-          />
-        </Link>
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Settings"
+          data-cy="settings-icon"
+        >
+          <SettingsIcon />
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
