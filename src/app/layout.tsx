@@ -26,8 +26,18 @@ const ps2 = Press_Start_2P({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://mathler-arcade.vercel.app"),
   title: "Mathler Arcade",
-  description: "A math puzzle game built with React.",
+  description:
+    "Daily math puzzle in a CRT-vaporwave arcade — solo or 1v1 multiplayer, with a built-in lo-fi radio.",
+  openGraph: {
+    title: "Mathler Arcade",
+    description:
+      "Daily math puzzle in a CRT-vaporwave arcade — solo or 1v1 multiplayer, with a built-in lo-fi radio.",
+    url: "/",
+    siteName: "Mathler Arcade",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
