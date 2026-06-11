@@ -2,6 +2,8 @@
 
 Daily math puzzle game in the style of Wordle. Players guess a hidden 6-character equation that evaluates to the day's target number — solo or in a real-time multiplayer duo — wrapped in a CRT-vaporwave arcade interface with a built-in lo-fi radio.
 
+<img width="1440" height="900" alt="Screenshot 2026-06-11 at 17 31 34" src="https://github.com/user-attachments/assets/52f7ece4-2e30-42fe-a83e-0e0207b887c2" />
+
 ## Features
 
 - **Daily puzzle** — a new equation every day, with color-coded feedback per tile
