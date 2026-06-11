@@ -261,7 +261,7 @@ export const GameProvider = ({ children }: { children: ReactNode }) => {
     const handleRevealDown = (event: KeyboardEvent) => {
       if (event.key.toLowerCase() !== "e" || !canReveal) return;
       event.preventDefault();
-      setRevealEquation(true);
+      setRevealEquation(false);
     };
 
     const handleRevealUp = (event: KeyboardEvent) => {

@@ -10,6 +10,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useAudio } from "@/hooks/use-audio";
 import { useGame } from "@/hooks/use-game";
 
@@ -48,33 +50,24 @@ export const Settings = () => {
           <DialogTitle className="text-foreground">Settings</DialogTitle>
         </DialogHeader>
         <div className="text-foreground flex flex-col gap-4 mt-4">
-          <fieldset className="border-0 p-0 m-0">
-            <legend className="text-base mb-2">Difficulty</legend>
-            <div className="flex flex-col">
-              <label>
-                <input
-                  type="radio"
-                  className="size-4 accent-foreground cursor-pointer"
-                  name="difficulty"
-                  checked={mode === "normal"}
-                  onChange={() => handleModeChange("normal")}
-                  data-cy="normal-mode-radio"
-                />
-                <span>Normal</span>
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  className="size-4 accent-foreground cursor-pointer"
-                  name="difficulty"
-                  checked={mode === "hard"}
-                  onChange={() => handleModeChange("hard")}
-                  data-cy="hard-mode-radio"
-                />
-                <span>Hard (no visual feedback)</span>
-              </label>
+          <RadioGroup
+            defaultValue={mode}
+            onValueChange={setMode}
+            className="w-fit"
+          >
+            <div className="flex items-center gap-3">
+              <RadioGroupItem
+                value="normal"
+                id="r1"
+                data-cy="hard-mode-radio"
+              />
+              <Label htmlFor="r1">Normal</Label>
             </div>
-          </fieldset>
+            <div className="flex items-center gap-3">
+              <RadioGroupItem value="hard" id="r2" data-cy="hard-mode-radio" />
+              <Label htmlFor="r2">Hard (no visual feedback)</Label>
+            </div>
+          </RadioGroup>
           <Button
             onClick={() => handleOpenChange(false)}
             data-cy="close-settings"
