@@ -2,6 +2,9 @@
 
 Daily math puzzle game in the style of Wordle. Players guess a hidden 6-character equation that evaluates to the day's target number.
 
+<img width="1440" height="900" alt="Screenshot 2026-06-11 at 17 31 34" src="https://github.com/user-attachments/assets/1d3c6968-af24-40fa-a3b7-6e6ece6be189" />
+
+
 ## Stack
 
 - **TypeScript** + **React 19** + **Next.js 16** (App Router)
